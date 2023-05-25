@@ -1,0 +1,21 @@
+{
+  "name": "1337-bot",
+  "license": "MIT",
+  "private": true,
+  "repository": "https://github.com/karl-run/1337-bot.git",
+  "packageManager": "yarn@3.5.1",
+  "scripts": {
+    "start": "ncc run src/server.ts",
+    "build": "ncc build src/server.ts -o dist"
+  },
+  "dependencies": {
+    "@slack/bolt": "^3.13.1",
+    "dotenv": "^16.0.3"
+  },
+  "devDependencies": {
+    "@types/node": "^20.2.3",
+    "@vercel/ncc": "^0.36.1",
+    "prettier": "^2.8.8",
+    "typescript": "^5.0.4"
+  }
+}
