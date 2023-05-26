@@ -1,8 +1,9 @@
 import { App } from "@slack/bolt";
 import { config } from "dotenv";
-import { getMilliseconds, getSeconds } from "date-fns/fp";
-import { format } from "date-fns";
-import nb from "date-fns/locale/nb";
+import { utcToZonedTime, format, getTimezoneOffset } from "date-fns-tz";
+import { getHours, getMinutes, getMilliseconds, getSeconds } from "date-fns";
+
+const OSLO = "Europe/Oslo";
 
 config();
 
@@ -15,18 +16,29 @@ const app = new App({
 app.message("1337", async ({ message, say, event }) => {
   if (message.type !== "message") return;
 
-  const time = new Date(+message.ts * 1000);
+  const time = utcToZonedTime(new Date(+message.ts * 1000), OSLO);
+  const offsetHours = getTimezoneOffset(OSLO, time) / 1000 / 60 / 60;
+  const [hour, minutes, seconds, ms] = [
+    getHours(time),
+    getMinutes(time),
+    getSeconds(time),
+    getMilliseconds(time),
+  ];
 
   console.log(
-    `Received leet at ${time.toISOString()} by user ${(message as any).user}`
+    `Received leet at ${time.toISOString()} by user ${
+      (message as any).user
+    } in channel ${event.channel}`
   );
+  console.log("Time:", hour, minutes, seconds, ms);
+  console.log("Offset:", offsetHours);
 
-  const isLeet = time.getHours() === 11 && time.getMinutes() === 37;
-  if (isLeet && time.getSeconds() === 0) {
+  const isLeet = hour === 13 && minutes === 37;
+  if (isLeet && seconds === 0) {
     await say(
       `En ekte leetoo av <@${
         (message as any).user
-      }>! :leetoo: Du var ${getMilliseconds(time)}ms over.`
+      }>! :leetoo: Du var ${ms}ms over.`
     );
   } else if (isLeet) {
     await say(
@@ -36,7 +48,9 @@ app.message("1337", async ({ message, say, event }) => {
     );
   } else {
     await say(
-      `Ikke 1337. :letogun:`
+      `Ikke 1337. :letogun: Klokka er ${format(time, "HH:mm", {
+        timeZone: OSLO,
+      })} jo`
     );
   }
 });
