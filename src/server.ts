@@ -48,9 +48,9 @@ app.message("1337", async ({ message, say, event }) => {
     );
   } else {
     await say(
-      `Ikke 1337. :letogun: Klokka er ${format(time, "HH:mm", {
+      `${format(time, "HH:mm", {
         timeZone: OSLO,
-      })} jo`
+      })} is not 13:37. This Incident Will Be Reported`
     );
   }
 });
