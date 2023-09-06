@@ -15,9 +15,9 @@ const app = new App({
 
 app.message("137", async ({ message, say, event }) => {
   if (message.type !== "message") return;
-  await say(`lol, klokka er jo ikke LET <@${
-      (message as any).user
-    }>! :letogun:`);
+  await say(
+    `lol, klokka er jo ikke LET <@${(message as any).user}>! :letogun:`
+  );
 });
 
 app.message("1337", async ({ message, say, event }) => {
@@ -41,14 +41,18 @@ app.message("1337", async ({ message, say, event }) => {
   console.log("Offset:", offsetHours);
 
   const isLeet = hour === 13 && minutes === 37;
-  if(hour === 13 && minutes === 36) {
-    const negativeOffset = 1000 - ms
-    await say(`Premature leetjaculation av <@${
+  if (hour === 13 && minutes === 36) {
+    const negativeOffset = 1000 - ms;
+    await say(
+      `Premature leetjaculation av <@${
         (message as any).user
-      }>!!! Du var ${negativeOffset}ms for tidlig :hot_face:`)
-  }  
-  
+      }>!!! Du var ${negativeOffset}ms for tidlig :hot_face:`
+    );
+  }
+
   if (isLeet && seconds === 0) {
+    await new Promise((resolve) => setTimeout(resolve, ms * 2));
+
     await say(
       `En ekte leetoo av <@${
         (message as any).user
@@ -62,7 +66,7 @@ app.message("1337", async ({ message, say, event }) => {
     );
   } else {
     await say(
-      `${format(time, "HH:mm", {
+      `<@${(message as any).user}>, ${format(time, "HH:mm", {
         timeZone: OSLO,
       })} is not 13:37. This Incident Will Be Reported`
     );
