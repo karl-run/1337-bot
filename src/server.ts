@@ -41,6 +41,13 @@ app.message("1337", async ({ message, say, event }) => {
   console.log("Offset:", offsetHours);
 
   const isLeet = hour === 13 && minutes === 37;
+  if(hour === 13 && minutes === 36) {
+    const negativeOffset = 1000 - ms
+    await say(`Premature leetjaculation av <@${
+        (message as any).user
+      }>!!! Du var ${negativeOffset}ms for tidlig :hot_face:`)
+  }  
+  
   if (isLeet && seconds === 0) {
     await say(
       `En ekte leetoo av <@${
