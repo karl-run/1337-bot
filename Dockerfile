@@ -1,15 +1,11 @@
-FROM oven/bun:1.0
+FROM gcr.io/distroless/nodejs:18
 
 WORKDIR /app
 
-COPY package.json /app
-COPY bun.lockb /app
-COPY src /app
-
-RUN bun install --production
-
-ENV NODE_ENV=production
+COPY dist /app
 
 EXPOSE 3000
 
-CMD ["server.ts"]
+ENV NODE_ENV=production
+
+CMD ["index.js"]

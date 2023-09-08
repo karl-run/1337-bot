@@ -2,21 +2,23 @@
   "name": "1337-bot",
   "license": "MIT",
   "private": true,
-  "module": "./src/server.ts",
-  "type": "module",
   "repository": "https://github.com/karl-run/1337-bot.git",
+  "packageManager": "yarn@3.5.1",
   "scripts": {
-    "dev": "bun run --watch ./src/server.ts",
-    "build": "bun build ./src/server.ts --outdir=dist"
+    "start": "ncc run src/server.ts",
+    "build": "ncc build src/server.ts -o dist"
   },
   "dependencies": {
     "@slack/bolt": "^3.13.1",
     "date-fns": "^2.30.0",
     "date-fns-tz": "^2.0.0",
+    "dotenv": "^16.0.3",
     "remeda": "^1.18.1"
   },
   "devDependencies": {
-    "bun-types": "latest",
-    "prettier": "^2.8.8"
+    "@types/node": "^20.2.3",
+    "@vercel/ncc": "^0.36.1",
+    "prettier": "^2.8.8",
+    "typescript": "^5.0.4"
   }
 }
