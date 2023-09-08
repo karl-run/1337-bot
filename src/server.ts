@@ -1,11 +1,8 @@
 import { App } from "@slack/bolt";
-import { config } from "dotenv";
 import { utcToZonedTime, format, getTimezoneOffset } from "date-fns-tz";
 import { getHours, getMinutes, getMilliseconds, getSeconds } from "date-fns";
 
 const OSLO = "Europe/Oslo";
-
-config();
 
 const app = new App({
   token: process.env.BOT_TOKEN,

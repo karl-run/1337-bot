@@ -20,13 +20,10 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: build server with node
-        uses: actions/setup-node@v3
+      - name: build server with bun
+        uses: oven-sh/setup-bun@v1
         with:
-          node-version: "18"
-
-      - run: yarn --immutable
-      - run: yarn build
+          bun-version: "1"
 
       - name: Log in to the Container registry
         uses: docker/login-action@v2
