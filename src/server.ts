@@ -1,5 +1,6 @@
 import { App } from "@slack/bolt";
 import { config } from "dotenv";
+import { Cron } from "croner";
 import { initDb } from "./db";
 import { configureJokeHandlers } from "./handlers/joke-handlers";
 import { configureLeetHandlers, postOrUpdate } from "./handlers/leet-handlers";
@@ -20,12 +21,16 @@ const app = new App({
 
   await app.start(process.env.PORT ?? 3000);
 
-  await postOrUpdate(app.client, "C059J1GNRQS");
+  const job = new Cron("38 11 * * *", async () => {
+    await postOrUpdate(app.client, "C059J1GNRQS");
+  });
 
   console.log("⚡️ Bolt app is running!");
 
   process.on("SIGTERM", () => {
     app.stop().then(() => {
+      job.stop();
+
       console.info("Shutting down gracefully");
       process.exit(0);
     });
