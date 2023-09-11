@@ -10,6 +10,36 @@ export function leetsToBlocks(
   seconds: number,
   todaysLeets: Awaited<ReturnType<typeof getTodaysLeets>>,
 ) {
+  if (todaysLeets.length === 0) {
+    return [
+      {
+        type: "section",
+        text: {
+          type: "mrkdwn",
+          text: `*Dagens leets*`,
+        },
+      },
+      {
+        type: "section",
+        text: {
+          type: "mrkdwn",
+          text: `Ingen leets i dag :sadparrot:`,
+        },
+      },
+      {
+        type: "context",
+        elements: [
+          {
+            type: "mrkdwn",
+            text: `:letogun: sist oppdatert ${formatHoursWithSeconds(
+              new Date(),
+            )}`,
+          },
+        ],
+      },
+    ];
+  }
+
   return R.compact([
     minutes === 37
       ? {
