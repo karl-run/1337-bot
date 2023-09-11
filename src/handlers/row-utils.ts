@@ -6,9 +6,7 @@ export function rowToStatus(
 ) {
   const timeParts = getTimeParts(slackTsToDate(row.ts));
 
-  if (timeParts.hour !== 13) {
-    return "garbage";
-  } else if (timeParts.minutes === 37 && timeParts.seconds === 0) {
+  if (timeParts.minutes === 37 && timeParts.seconds === 0) {
     return "leetos";
   } else if (timeParts.minutes === 37) {
     return "leet";
@@ -16,5 +14,7 @@ export function rowToStatus(
     return "premature";
   } else if (timeParts.minutes === 38) {
     return "late";
+  } else {
+    return "garbage";
   }
 }

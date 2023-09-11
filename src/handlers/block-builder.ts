@@ -6,6 +6,7 @@ import { getTodaysLeets } from "../db";
 import { formatHoursWithSeconds } from "../date-utils";
 
 export function leetsToBlocks(
+  hour: number,
   minutes: number,
   seconds: number,
   todaysLeets: Awaited<ReturnType<typeof getTodaysLeets>>,
@@ -41,7 +42,7 @@ export function leetsToBlocks(
   }
 
   return R.compact([
-    minutes === 37
+    hour == 13 && minutes === 37
       ? {
           type: "section",
           text: {

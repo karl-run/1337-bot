@@ -1,5 +1,10 @@
 import { getTodaysLeets } from "../db";
-import { getTimeParts, slackTsToDate } from "../date-utils";
+import {
+  formatHours,
+  formatHoursWithSeconds,
+  getTimeParts,
+  slackTsToDate,
+} from "../date-utils";
 import { formatDistanceStrict, set } from "date-fns";
 import { nb } from "date-fns/locale";
 
@@ -34,8 +39,11 @@ function formatPrematureRows(rows: Awaited<ReturnType<typeof getTodaysLeets>>) {
 function formatLateRows(rows: Awaited<ReturnType<typeof getTodaysLeets>>) {
   return rows
     .map((row) => {
-      const { minutes, seconds } = getTimeParts(slackTsToDate(row.ts));
-      return `:letoint: <@${row.message.user}>: ${minutes}m ${seconds}s`;
+      const date = slackTsToDate(row.ts);
+      const { minutes, seconds } = getTimeParts(date);
+      return `:letoint: <@${
+        row.message.user
+      }>: ${minutes}m ${seconds}s (${formatHours(date)})`;
     })
     .join("\n");
 }
@@ -57,7 +65,7 @@ function messageFormatters(rows: Awaited<ReturnType<typeof getTodaysLeets>>) {
         {
           locale: nb,
         },
-      )} bom :roflrofl:`;
+      )} bom :roflrofl: (${formatHours(date)})`;
     })
     .join("\n");
 }

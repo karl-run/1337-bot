@@ -69,12 +69,12 @@ export function configureLeetHandlers(app: App) {
 }
 
 export async function postOrUpdate(client: WebClient, channelId: string) {
-  const { minutes, seconds } = getTimeParts(new Date());
+  const { hour, minutes, seconds } = getTimeParts(new Date());
 
   console.log("Posting or updating");
   const existingTS = await getCurrentBotMessageTS(channelId);
   const todaysLeets = await getTodaysLeets(channelId);
-  const blocks = leetsToBlocks(minutes, seconds, todaysLeets);
+  const blocks = leetsToBlocks(hour, minutes, seconds, todaysLeets);
 
   if (existingTS) {
     console.log(`Found existing ts: ${existingTS}`);
