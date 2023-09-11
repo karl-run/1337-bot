@@ -1,4 +1,9 @@
 import { Client } from "pg";
+import { config } from "dotenv";
+import { GenericMessageEvent, KnownEventFromType } from "@slack/bolt";
+import { slackTsToDate } from "./date-utils";
+
+config();
 
 const client = new Client({
   host: process.env.DATABASE_URL,
@@ -9,22 +14,46 @@ const client = new Client({
 });
 
 export async function initDb() {
+  console.log("Connecting to database");
   await client.connect();
+  console.log("Connected to database");
 
   await client.query(`
-        CREATE TABLE IF NOT EXISTS messages (
-            id SERIAL PRIMARY KEY,
-            ts TIMESTAMP NOT NULL,
-            channel VARCHAR(255) NOT NULL
-        );
-    `);
+      CREATE TABLE IF NOT EXISTS bot_messages
+      (
+          id          SERIAL PRIMARY KEY,
+          ts          VARCHAR(255)                        NOT NULL,
+          channel     VARCHAR(255)                        NOT NULL,
+          inserted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
+      );
+
+      CREATE TABLE IF NOT EXISTS leet_messages
+      (
+          id          SERIAL PRIMARY KEY,
+          ts          VARCHAR(255)                        NOT NULL,
+          channel     VARCHAR(255)                        NOT NULL,
+          ts_as_date  TIMESTAMP                           NOT NULL,
+          inserted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+          message     JSONB                               NOT NULL
+      );
+
+      CREATE INDEX IF NOT EXISTS leet_messages_channel_idx ON leet_messages (channel);
+  `);
 }
 
-export async function getCurrentMessageTS(): Promise<string | null> {
+export async function getCurrentBotMessageTS(
+  channelId: string,
+): Promise<string | null> {
   const result = await client.query(
     `
-            SELECT ts FROM messages WHERE ts::date = current_date;
-        `
+            SELECT ts
+            FROM bot_messages
+            WHERE inserted_at::date = current_date
+              AND channel = $1
+            ORDER BY ts DESC
+            LIMIT 1;
+        `,
+    [channelId],
   );
 
   if (result.rowCount > 0) {
@@ -34,14 +63,51 @@ export async function getCurrentMessageTS(): Promise<string | null> {
   }
 }
 
-export async function insertCurrentMessage(
+export async function insertNewBotMessage(
   ts: string,
-  channelId: string
+  channelId: string,
 ): Promise<void> {
   await client.query(
     `
-                INSERT INTO messages (ts, channel) VALUES ($1, $2);
-            `,
-    [ts, channelId]
+            INSERT INTO bot_messages (ts, channel)
+            VALUES ($1, $2);
+        `,
+    [ts, channelId],
   );
+}
+
+export async function insertLeetMessage(
+  channelId: string,
+  message: GenericMessageEvent,
+) {
+  console.info(`Inserting message for user ${(message as any).user}`);
+  await client.query(
+    `
+            INSERT INTO leet_messages (ts, ts_as_date, channel, message)
+            VALUES ($1, $2, $3, $4);
+        `,
+    [message.ts, slackTsToDate(message.ts), channelId, message],
+  );
+}
+
+export async function getTodaysLeets(channelId: string) {
+  const queryResult = await client.query(
+    `
+      SELECT *
+      FROM leet_messages
+      WHERE channel = $1
+        AND ts_as_date > current_date
+      ORDER BY ts_as_date DESC;
+  `,
+    [channelId],
+  );
+
+  return queryResult.rows as {
+    id: number;
+    ts: string;
+    channel: string;
+    ts_as_date: Date;
+    inserted_at: Date;
+    message: GenericMessageEvent;
+  }[];
 }

@@ -2,7 +2,7 @@ import { App } from "@slack/bolt";
 import { config } from "dotenv";
 import { initDb } from "./db";
 import { configureJokeHandlers } from "./handlers/joke-handlers";
-import { configureLeetHandlers } from "./handlers/leet-handlers";
+import { configureLeetHandlers, postOrUpdate } from "./handlers/leet-handlers";
 
 config();
 
@@ -19,6 +19,8 @@ const app = new App({
   configureLeetHandlers(app);
 
   await app.start(process.env.PORT ?? 3000);
+
+  await postOrUpdate(app.client, "C059J1GNRQS");
 
   console.log("⚡️ Bolt app is running!");
 
