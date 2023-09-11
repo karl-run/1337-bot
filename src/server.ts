@@ -26,7 +26,7 @@ const app = new App({
   });
 
   console.log("⚡️ Bolt app is running!");
-
+  console.log(`Cron job is running! Next run ${job.nextRun().toISOString()}`);
   process.on("SIGTERM", () => {
     app.stop().then(() => {
       job.stop();

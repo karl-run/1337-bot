@@ -57,7 +57,7 @@ function messageFormatters(rows: Awaited<ReturnType<typeof getTodaysLeets>>) {
         {
           locale: nb,
         },
-      )}`;
+      )} bom :roflrofl:`;
     })
     .join("\n");
 }
