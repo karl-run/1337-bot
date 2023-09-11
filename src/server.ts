@@ -22,7 +22,7 @@ const app = new App({
   await app.start(process.env.PORT ?? 3000);
 
   const job = new Cron("38 11 * * *", async () => {
-    await postOrUpdate(app.client, "C059J1GNRQS");
+    await postOrUpdate(app.client, "C04N7R2F8B0");
   });
 
   console.log("⚡️ Bolt app is running!");
