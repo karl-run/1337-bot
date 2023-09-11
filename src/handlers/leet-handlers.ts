@@ -82,7 +82,7 @@ export async function postOrUpdate(client: WebClient, channelId: string) {
     await client.chat.update({
       channel: channelId,
       ts: existingTS,
-      text: new Date().toISOString(),
+      text: "Dagens leets",
       blocks,
     });
   } else {
@@ -90,6 +90,7 @@ export async function postOrUpdate(client: WebClient, channelId: string) {
 
     const postedMessage = await client.chat.postMessage({
       channel: channelId,
+      text: "Dagens leets",
       blocks,
     });
 
