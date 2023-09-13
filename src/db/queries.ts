@@ -3,34 +3,7 @@ import { GenericMessageEvent } from "@slack/bolt";
 import { slackTsToDate } from "../utils/date-utils";
 
 import { client } from "./client";
-
-export async function initDb() {
-  console.log("Connecting to database");
-  await client.connect();
-  console.log("Connected to database");
-
-  await client.query(`
-      CREATE TABLE IF NOT EXISTS bot_messages
-      (
-          id          SERIAL PRIMARY KEY,
-          ts          VARCHAR(255)                        NOT NULL,
-          channel     VARCHAR(255)                        NOT NULL,
-          inserted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
-      );
-
-      CREATE TABLE IF NOT EXISTS leet_messages
-      (
-          id          SERIAL PRIMARY KEY,
-          ts          VARCHAR(255)                        NOT NULL,
-          channel     VARCHAR(255)                        NOT NULL,
-          ts_as_date  TIMESTAMP                           NOT NULL,
-          inserted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
-          message     JSONB                               NOT NULL
-      );
-
-      CREATE INDEX IF NOT EXISTS leet_messages_channel_idx ON leet_messages (channel);
-  `);
-}
+import { UserLeetRow } from "./types";
 
 export async function getCurrentBotMessageTS(
   channelId: string,
@@ -80,15 +53,6 @@ export async function insertLeetMessage(
     [message.ts, slackTsToDate(message.ts), channelId, message],
   );
 }
-
-type UserLeetRow = {
-  id: number;
-  ts: string;
-  channel: string;
-  ts_as_date: Date;
-  inserted_at: Date;
-  message: GenericMessageEvent;
-};
 
 export async function getTodaysLeets(channelId: string) {
   const queryResult = await client.query(
