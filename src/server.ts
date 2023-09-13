@@ -1,7 +1,7 @@
 import { App } from "@slack/bolt";
 import { config } from "dotenv";
 import { Cron } from "croner";
-import { initDb } from "./db";
+import { initDb } from "./db/queries";
 import { configureJokeHandlers } from "./handlers/joke-handlers";
 import { configureLeetHandlers, postOrUpdate } from "./handlers/leet-handlers";
 import { configureCommandHandlers } from "./handlers/command-handlers";

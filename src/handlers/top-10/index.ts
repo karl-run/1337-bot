@@ -3,9 +3,9 @@ import { formatDistanceToNowStrict } from "date-fns";
 import * as R from "remeda";
 import { nb } from "date-fns/locale";
 
-import { createPermalink } from "../../slack-utils";
-import { slackTsToDate } from "../../date-utils";
-import * as db from "../../db";
+import { createPermalink } from "../../utils/slack-utils";
+import { slackTsToDate } from "../../utils/date-utils";
+import * as db from "../../db/queries";
 
 type DateMessageTuple = readonly [Date, GenericMessageEvent];
 

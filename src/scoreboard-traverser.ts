@@ -4,7 +4,7 @@ import { KnownBlock } from "@slack/bolt";
 import * as fs from "fs";
 import { formatDistanceToNow } from "date-fns";
 import { nb } from "date-fns/locale";
-import { createPermalink } from "./slack-utils";
+import { createPermalink } from "./utils/slack-utils";
 
 type Message = ConversationsHistoryResponse["messages"][number];
 
@@ -13,7 +13,7 @@ type DateMessageTuple = readonly [Date, Message];
 export async function traverseHistory(channelId: string, client: WebClient) {
   if (true) {
     const jason: DateMessageTuple[] = JSON.parse(
-      fs.readFileSync("premature-leet-messages.json", "utf-8")
+      fs.readFileSync("premature-leet-messages.json", "utf-8"),
     ).map(([date, message]: [Date, Message]) => [new Date(date), message]);
 
     // console.log(jason);
@@ -32,7 +32,7 @@ export async function traverseHistory(channelId: string, client: WebClient) {
   });
 
   const restOfMessages: Message[] = await traverser(
-    initialPage.response_metadata.next_cursor
+    initialPage.response_metadata.next_cursor,
   );
   const allMessages: DateMessageTuple[] = [
     ...(initialPage.messages ?? []).filter(byNonBotLeetMessages),
@@ -56,7 +56,7 @@ function nextPageTraverser(client: WebClient, channelId: string) {
   let pageCount = 0;
 
   const getNextPage = async (
-    nextCursor: string | undefined
+    nextCursor: string | undefined,
   ): Promise<Message[]> => {
     if (nextCursor == null) {
       console.info("Hit end cursor");
@@ -72,7 +72,7 @@ function nextPageTraverser(client: WebClient, channelId: string) {
 
     if (nextPage.response_metadata.next_cursor) {
       const nextNextPage = await getNextPage(
-        nextPage.response_metadata.next_cursor
+        nextPage.response_metadata.next_cursor,
       );
 
       return [
@@ -105,7 +105,7 @@ function createLeetDistributionPerSecondsCSV(messages: DateMessageTuple[]) {
     R.toPairs,
     R.sortBy(([seconds]) => +seconds),
     R.map(([seconds, count]) => `${seconds},${count}`),
-    R.join("\n")
+    R.join("\n"),
   );
 
   console.log(countPerSecondsCSV);
@@ -116,7 +116,7 @@ function top10Leets(channelId: string, messages: DateMessageTuple[]) {
     messages,
     R.filter(([date]) => date.getSeconds() === 59),
     R.sortBy([([date]) => 1000 - date.getMilliseconds(), "desc"]),
-    R.take(10)
+    R.take(10),
   );
 
   console.log(JSON.stringify(createTop10Blocks(channelId, top10), null, 2));
@@ -124,7 +124,7 @@ function top10Leets(channelId: string, messages: DateMessageTuple[]) {
 
 function createTop10Blocks(
   channelId: string,
-  messages: DateMessageTuple[]
+  messages: DateMessageTuple[],
 ): KnownBlock[] {
   const formatMessage = ([date, message]: DateMessageTuple): string =>
     `-${(1000 - date.getMilliseconds()).toFixed(0).padStart(3, "0")}ms av <@${

@@ -1,15 +1,15 @@
 import { WebClient } from "@slack/web-api";
 import { App, GenericMessageEvent } from "@slack/bolt";
 
-import { formatHours, getTimeParts, slackTsToDate } from "../date-utils";
+import { formatHours, getTimeParts, slackTsToDate } from "../utils/date-utils";
 import {
   getCurrentBotMessageTS,
   getTodaysLeets,
   insertLeetMessage,
   insertNewBotMessage,
-} from "../db";
+} from "../db/queries";
 
-import { leetsToBlocks } from "./block-builder";
+import { leetsToBlocks } from "./daily-leet/block-builder";
 
 export function configureLeetHandlers(app: App) {
   app.message("1337", async ({ message, say, event, client }) => {

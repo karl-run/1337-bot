@@ -1,9 +1,9 @@
 import * as R from "remeda";
-import { createProgressBar } from "../slack-utils";
+import { createProgressBar } from "../../utils/slack-utils";
 import { rowToStatus } from "./row-utils";
 import { toCategoryMarkdown } from "./message-formatters";
-import { getTodaysLeets } from "../db";
-import { formatHoursWithSeconds } from "../date-utils";
+import { getTodaysLeets } from "../../db/queries";
+import { formatHoursWithSeconds } from "../../utils/date-utils";
 
 export function leetsToBlocks(
   hour: number,

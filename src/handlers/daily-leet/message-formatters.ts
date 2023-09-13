@@ -1,10 +1,5 @@
-import { getTodaysLeets } from "../db";
-import {
-  formatHours,
-  formatHoursWithSeconds,
-  getTimeParts,
-  slackTsToDate,
-} from "../date-utils";
+import { getTodaysLeets } from "../../db/queries";
+import { formatHours, getTimeParts, slackTsToDate } from "../../utils/date-utils";
 import { formatDistanceStrict, set } from "date-fns";
 import { nb } from "date-fns/locale";
 

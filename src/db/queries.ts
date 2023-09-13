@@ -1,17 +1,8 @@
-import { Client } from "pg";
-import { config } from "dotenv";
-import { GenericMessageEvent, KnownEventFromType } from "@slack/bolt";
-import { slackTsToDate } from "./date-utils";
+import { GenericMessageEvent } from "@slack/bolt";
 
-config();
+import { slackTsToDate } from "../utils/date-utils";
 
-const client = new Client({
-  host: process.env.DATABASE_URL,
-  user: process.env.DATABASE_USER,
-  password: process.env.DATABASE_PASSWORD,
-  port: 5432,
-  database: "postgres",
-});
+import { client } from "./client";
 
 export async function initDb() {
   console.log("Connecting to database");

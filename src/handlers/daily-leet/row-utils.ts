@@ -1,5 +1,5 @@
-import { getTimeParts, slackTsToDate } from "../date-utils";
-import { getTodaysLeets } from "../db";
+import { getTimeParts, slackTsToDate } from "../../utils/date-utils";
+import { getTodaysLeets } from "../../db/queries";
 
 export function rowToStatus(
   row: Awaited<ReturnType<typeof getTodaysLeets>>[number],
