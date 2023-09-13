@@ -1,3 +1,5 @@
 # 1337 bot
 
-TODO
+It's my 1337 bot, thanks.
+
+https://bun.sh
