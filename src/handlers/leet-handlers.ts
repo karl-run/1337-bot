@@ -12,12 +12,6 @@ import {
 import { leetsToBlocks } from "./block-builder";
 
 export function configureLeetHandlers(app: App) {
-  app.command("/debug", async ({ command, ack, say, client, context }) => {
-    await ack();
-
-    await postOrUpdate(client, command.channel_id);
-  });
-
   app.message("1337", async ({ message, say, event, client }) => {
     if (message.type !== "message") return;
     if (message.subtype === "bot_message") return;

@@ -4,6 +4,7 @@ import { Cron } from "croner";
 import { initDb } from "./db";
 import { configureJokeHandlers } from "./handlers/joke-handlers";
 import { configureLeetHandlers, postOrUpdate } from "./handlers/leet-handlers";
+import { configureCommandHandlers } from "./handlers/command-handlers";
 
 config();
 
@@ -18,6 +19,7 @@ const app = new App({
 
   configureJokeHandlers(app);
   configureLeetHandlers(app);
+  configureCommandHandlers(app);
 
   await app.start(process.env.PORT ?? 3000);
 

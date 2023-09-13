@@ -90,6 +90,15 @@ export async function insertLeetMessage(
   );
 }
 
+type UserLeetRow = {
+  id: number;
+  ts: string;
+  channel: string;
+  ts_as_date: Date;
+  inserted_at: Date;
+  message: GenericMessageEvent;
+};
+
 export async function getTodaysLeets(channelId: string) {
   const queryResult = await client.query(
     `
@@ -102,12 +111,19 @@ export async function getTodaysLeets(channelId: string) {
     [channelId],
   );
 
-  return queryResult.rows as {
-    id: number;
-    ts: string;
-    channel: string;
-    ts_as_date: Date;
-    inserted_at: Date;
-    message: GenericMessageEvent;
-  }[];
+  return queryResult.rows as UserLeetRow[];
+}
+
+export async function getAllLeets(channelId: string): Promise<UserLeetRow[]> {
+  const queryResult = await client.query(
+    `
+            SELECT *
+            FROM leet_messages
+            WHERE channel = $1
+            ORDER BY ts_as_date DESC;
+        `,
+    [channelId],
+  );
+
+  return queryResult.rows as UserLeetRow[];
 }
