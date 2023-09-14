@@ -36,6 +36,7 @@ export function configureLeetHandlers(app: App) {
           (message as any).user
         }>!!! Du var ${negativeOffset}ms for tidlig :hot_face:`,
       );
+      return;
     }
 
     if (isLeet && seconds === 0) {
