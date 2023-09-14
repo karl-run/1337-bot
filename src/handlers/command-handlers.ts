@@ -1,6 +1,7 @@
 import { App } from "@slack/bolt";
 import { postOrUpdate } from "./leet-handlers";
 import { getTopBlocks } from "./top-10";
+import { getTimeParts } from "../utils/date-utils";
 
 export function configureCommandHandlers(app: App) {
   app.command(
@@ -8,17 +9,19 @@ export function configureCommandHandlers(app: App) {
     async ({ command, ack, say, client, context }) => {
       await ack();
 
-      if (new Date().getHours() !== 13 || new Date().getMinutes() !== 37) {
-        await client.chat.postEphemeral({
-          channel: command.channel_id,
-          user: command.user_id,
-          text: `:warning: Må du kødde med botten <@${command.user_id}>???`,
-        });
+      const { hour, minutes } = getTimeParts(new Date());
+
+      if ((hour === 13 && minutes >= 37) || hour > 13) {
+        await postOrUpdate(client, command.channel_id);
 
         return;
       }
 
-      await postOrUpdate(client, command.channel_id);
+      await client.chat.postEphemeral({
+        channel: command.channel_id,
+        user: command.user_id,
+        text: `:warning: Må du kødde med botten <@${command.user_id}>???`,
+      });
     },
   );
 
