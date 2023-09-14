@@ -31,34 +31,38 @@ export function configureLeetHandlers(app: App) {
     const isLeet = hour === 13 && minutes === 37;
     if (hour === 13 && minutes === 36) {
       const negativeOffset = 1000 - ms;
-      await say(
-        `Premature leetjaculation av <@${
+      await say({
+        thread_ts: message.ts,
+        text: `Premature leetjaculation <@${
           (message as any).user
         }>!!! Du var ${negativeOffset}ms for tidlig :hot_face:`,
-      );
+      });
       return;
     }
 
     if (isLeet && seconds === 0) {
       await new Promise((resolve) => setTimeout(resolve, ms * 2));
 
-      await say(
-        `En ekte leetoo av <@${
+      await say({
+        thread_ts: message.ts,
+        text: `En ekte leetoo <@${
           (message as any).user
-        }>! :leetoo: Du var ${ms}ms over.`,
-      );
+        }>! :leetoo: Du var ${ms}ms inn i sekundet.`,
+      });
     } else if (isLeet) {
-      await say(
-        `Bra jobba <@${
+      await say({
+        thread_ts: message.ts,
+        text: `Bra jobba <@${
           (message as any).user
         }>! Du var ${seconds} sekunder inn i minuttet.`,
-      );
+      });
     } else {
-      await say(
-        `<@${(message as any).user}>, ${formatHours(
+      await say({
+        thread_ts: message.ts,
+        text: `<@${(message as any).user}>, ${formatHours(
           time,
         )} is not 13:37. This Incident Will Be Reported`,
-      );
+      });
     }
   });
 }
