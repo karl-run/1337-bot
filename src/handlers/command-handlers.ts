@@ -2,6 +2,7 @@ import { App } from "@slack/bolt";
 import { postOrUpdate } from "./leet-handlers";
 import { getTopBlocks } from "./top-10";
 import { getTimeParts } from "../utils/date-utils";
+import { getTopStreak } from "./streak";
 
 export function configureCommandHandlers(app: App) {
   app.command(
@@ -21,6 +22,30 @@ export function configureCommandHandlers(app: App) {
         channel: command.channel_id,
         user: command.user_id,
         text: `:warning: Må du kødde med botten <@${command.user_id}>???`,
+      });
+    },
+  );
+
+  app.command(
+    "/1337-streaks",
+    async ({ command, ack, say, client, context }) => {
+      const topStreaksBlocks = await getTopStreak(command.channel_id);
+
+      await say({
+        text: "Top Streaks",
+        channel: command.channel_id,
+        blocks: [
+          ...topStreaksBlocks,
+          {
+            type: "context",
+            elements: [
+              {
+                type: "mrkdwn",
+                text: `Denne top streaks-listen er bestilt av <@${command.user_id}>`,
+              },
+            ],
+          },
+        ],
       });
     },
   );

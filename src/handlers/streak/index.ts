@@ -1,11 +1,11 @@
 import * as R from "remeda";
 import * as db from "../../db/queries";
-import { initDb } from "../../db/client";
-import { slackTsToDate } from "../../utils/date-utils";
+import { slackTsToDate, toReadableDatePeriod } from "../../utils/date-utils";
 import { addDays, formatISO, isSameDay } from "date-fns";
-import { GenericMessageEvent } from "@slack/bolt";
+import { GenericMessageEvent, KnownBlock } from "@slack/bolt";
+import { createPermalink } from "../../utils/slack-utils";
 
-export async function getTopStreak(channelId: string) {
+export async function getTopStreak(channelId: string): Promise<KnownBlock[]> {
   const leets = await db.getAllLeets(channelId);
 
   const streaks = R.pipe(
@@ -22,21 +22,49 @@ export async function getTopStreak(channelId: string) {
     R.toPairs,
     R.sortBy(([dateKey]) => dateKey),
     R.map(([, tuple]) => tuple),
-    R.reduce(toStreaks, {
-      prevMetadata: [null, null],
-      innerAcc: [],
-    } satisfies ToStreaksReduceAccumulator),
-    R.prop("innerAcc"),
-    R.filter((it) => it.length >= 5),
+    reduceToStreak,
+    R.filter((it) => it.length >= 3),
     R.sortBy([(it) => it.length, "desc"]),
-    // TODO map to streak info
-    R.map((it) => it.map((it) => [slackTsToDate(it.ts), it.user])),
+    R.map(streakSetToStreakMetadata(channelId)),
   );
 
-  console.log(streaks.length);
-
-  // Bun.write("streaks.json", JSON.stringify(streaks, null, 2));
+  return [
+    {
+      type: "header",
+      text: {
+        type: "plain_text",
+        text: "Top Streaks",
+        emoji: true,
+      },
+    },
+    {
+      type: "section",
+      text: {
+        type: "mrkdwn",
+        text: `${streaks
+          .map(
+            (it) =>
+              `*${it.length} dager* streak av <@${
+                it.user
+              }> - ${toReadableDatePeriod(it.fom, it.tom)}\n${it.messages
+                .map((msg) => `\t- ${msg.text} (<${msg.link}|link>)`)
+                .join("\n")}`,
+          )
+          .join("\n")}`,
+      },
+    },
+  ];
 }
+
+const reduceToStreak: (
+  tuples: readonly (readonly [Date, GenericMessageEvent])[],
+) => readonly GenericMessageEvent[][] = R.createPipe(
+  R.reduce(toStreaks, {
+    prevMetadata: [null, null],
+    innerAcc: [],
+  } satisfies ToStreaksReduceAccumulator),
+  R.prop("innerAcc"),
+);
 
 type ToStreaksReduceAccumulator = {
   prevMetadata: [Date | null, string | null];
@@ -67,7 +95,7 @@ function toStreaks(
     const [currentStreak, ...rest] = innerAcc;
     return {
       prevMetadata: [date, message.user],
-      innerAcc: [[...currentStreak, message], ...innerAcc],
+      innerAcc: [[...currentStreak, message], ...rest],
     } satisfies ToStreaksReduceAccumulator;
   } else {
     // Day and/or user differs, reset streak
@@ -78,5 +106,22 @@ function toStreaks(
   }
 }
 
-// await initDb();
-// await getTopStreak("C04N7R2F8B0");
+function streakSetToStreakMetadata(channelId: string) {
+  return (messages: readonly GenericMessageEvent[]) => {
+    const [first, ...rest] = messages;
+    const [last] = rest.slice(-1);
+    return {
+      user: first.user,
+      channel: channelId,
+      fom: slackTsToDate(first.ts),
+      tom: slackTsToDate(last.ts),
+      length: messages.length,
+      messages: messages.map((it) => ({
+        text: it.text,
+        ts: it.ts,
+        user: it.user,
+        link: createPermalink(channelId, it.ts),
+      })),
+    };
+  };
+}
