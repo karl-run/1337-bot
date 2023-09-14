@@ -1,5 +1,4 @@
 import * as R from "remeda";
-import { createProgressBar } from "../../utils/slack-utils";
 import { rowToStatus } from "./row-utils";
 import { toCategoryMarkdown } from "./message-formatters";
 import { getTodaysLeets } from "../../db/queries";
@@ -42,15 +41,6 @@ export function leetsToBlocks(
   }
 
   return R.compact([
-    hour == 13 && minutes === 37
-      ? {
-          type: "section",
-          text: {
-            type: "mrkdwn",
-            text: createProgressBar((seconds / 59) * 100),
-          },
-        }
-      : undefined,
     {
       type: "section",
       text: {
