@@ -26,7 +26,11 @@ export function configureLeetHandlers(app: App) {
 
     const { hour, minutes, seconds, ms } = getTimeParts(time);
     await insertLeetMessage(event.channel, message as GenericMessageEvent);
-    await postOrUpdate(client, event.channel);
+
+    // Only update bot-summary after 13:38+
+    if ((hour === 13 && minutes > 37) || hour > 13) {
+      await postOrUpdate(client, event.channel);
+    }
 
     const isLeet = hour === 13 && minutes === 37;
     if (hour === 13 && minutes === 36) {
