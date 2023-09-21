@@ -69,6 +69,20 @@ export async function getTodaysLeets(channelId: string) {
   return queryResult.rows as UserLeetRow[];
 }
 
+export async function getLeetForDay(channelId: string, day: Date) {
+  const queryResult = await client.query(
+    `
+        SELECT *
+        FROM public.leet_messages
+        WHERE channel = $1
+          AND date(ts_as_date) = $2::date;
+    `,
+    [channelId, day],
+  );
+
+  return queryResult.rows as UserLeetRow[];
+}
+
 export async function getAllLeets(channelId: string): Promise<UserLeetRow[]> {
   const queryResult = await client.query(
     `
