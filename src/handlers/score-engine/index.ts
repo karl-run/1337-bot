@@ -46,8 +46,18 @@ function scoreLeetos(
   return {
     ...day,
     leetos: day.leetos.map((leet): ScoredMessage => {
+      const ms = slackTsToMs(leet.ts);
+
+      const omegaLeet = ms === 0;
+      if (omegaLeet) {
+        return {
+          points: 13337,
+          message: leet,
+        };
+      }
+
       const firstBonus = leet.ts === day.leetos[0].ts ? 500 : 0;
-      const points = firstBonus + 1000 + (1000 - slackTsToMs(leet.ts));
+      const points = firstBonus + 1000 + (1000 - ms);
 
       return {
         points,
@@ -78,7 +88,7 @@ function scoreLeets(
     ...day,
     leet: day.leet.map((it): ScoredMessage => {
       const firstBonus = day.leetos.length === 0 ? 500 : 0;
-      const within3SecondsPoints = slackTsToSeconds(it.ts) <= 3 ? 250 : 0;
+      const within3SecondsPoints = slackTsToSeconds(it.ts) <= 3 ? 250 : 27;
 
       return {
         points: firstBonus + within3SecondsPoints,
