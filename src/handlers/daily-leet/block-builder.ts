@@ -55,6 +55,7 @@ export function scoredDayToBlocks(scoredDay: ScoredDay) {
         text: R.pipe(
           scoredDay,
           R.toPairs.strict,
+          R.filter(([_, messages]) => messages.length > 0),
           R.map(toCategoryMarkdown),
           R.join("\n"),
         ),
