@@ -1,3 +1,4 @@
+import * as R from "remeda";
 import { format, utcToZonedTime } from "date-fns-tz";
 import {
   getDate,
@@ -30,6 +31,16 @@ export function getTimeParts(time: Date): {
     ms: getMilliseconds(time),
   };
 }
+
+export const slackTsToMs: (ts: string) => number = R.createPipe(
+  slackTsToDate,
+  getMilliseconds,
+);
+
+export const slackTsToSeconds: (ts: string) => number = R.createPipe(
+  slackTsToDate,
+  getSeconds,
+);
 
 export function formatHours(time: Date) {
   return format(time, "HH:mm", { timeZone: OSLO_TZ });

@@ -1,16 +1,16 @@
 import * as R from "remeda";
-import { rowToStatus } from "./row-utils";
 import { toCategoryMarkdown } from "./message-formatters";
-import { getTodaysLeets } from "../../db/queries";
 import { formatHoursWithSeconds } from "../../utils/date-utils";
+import { ScoredDay } from "../score-engine";
 
-export function leetsToBlocks(
-  hour: number,
-  minutes: number,
-  seconds: number,
-  todaysLeets: Awaited<ReturnType<typeof getTodaysLeets>>,
-) {
-  if (todaysLeets.length === 0) {
+export function scoredDayToBlocks(scoredDay: ScoredDay) {
+  const leetCount = R.pipe(
+    scoredDay,
+    R.toPairs,
+    R.flatMap(([, messages]) => messages),
+  ).length;
+
+  if (leetCount === 0) {
     return [
       {
         type: "section",
@@ -53,10 +53,8 @@ export function leetsToBlocks(
       text: {
         type: "mrkdwn",
         text: R.pipe(
-          todaysLeets,
-          R.sortBy((row) => row.ts),
-          R.groupBy(rowToStatus),
-          R.toPairs,
+          scoredDay,
+          R.toPairs.strict,
           R.map(toCategoryMarkdown),
           R.join("\n"),
         ),
@@ -67,9 +65,9 @@ export function leetsToBlocks(
       elements: [
         {
           type: "mrkdwn",
-          text: `:leetoo: ${
-            todaysLeets.length
-          } leets i dag, sist oppdatert ${formatHoursWithSeconds(new Date())}`,
+          text: `:leetoo: ${leetCount} leets i dag, sist oppdatert ${formatHoursWithSeconds(
+            new Date(),
+          )}`,
         },
       ],
     },

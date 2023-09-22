@@ -15,7 +15,7 @@
     "date-fns-tz": "^2.0.0",
     "dotenv": "^16.0.3",
     "pg": "^8.11.3",
-    "remeda": "^1.18.1"
+    "remeda": "^1.27.0"
   },
   "devDependencies": {
     "@types/node": "^20.2.3",

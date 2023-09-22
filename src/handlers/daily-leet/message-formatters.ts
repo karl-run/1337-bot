@@ -6,48 +6,52 @@ import {
 } from "../../utils/date-utils";
 import { formatDistanceStrict, set } from "date-fns";
 import { nb } from "date-fns/locale";
+import { LeetStatus } from "./row-utils";
+import { ScoredMessage } from "../score-engine";
 
-function formatLeetos(rows: Awaited<ReturnType<typeof getTodaysLeets>>) {
+type StatusScoredMessageTuple = [key: LeetStatus, rows: ScoredMessage[]];
+
+function formatLeetos(rows: ScoredMessage[]) {
   return rows
     .map((row) => {
-      const { ms } = getTimeParts(slackTsToDate(row.ts));
-      return `:letopet: <@${row.message.user}>: ${ms}ms`;
+      const { ms } = getTimeParts(slackTsToDate(row.message.ts));
+      return `:letopet: <@${row.message.message.user}>: ${ms}ms (+${row.points})`;
     })
     .join("\n");
 }
 
-function formatLeets(rows: Awaited<ReturnType<typeof getTodaysLeets>>) {
+function formatLeets(rows: ScoredMessage[]) {
   return rows
     .map((row) => {
-      const { seconds, ms } = getTimeParts(slackTsToDate(row.ts));
-      return `:letojam: <@${row.message.user}>: ${seconds}s ${ms}ms`;
+      const { seconds, ms } = getTimeParts(slackTsToDate(row.message.ts));
+      return `:letojam: <@${row.message.message.user}>: ${seconds}s ${ms}ms (+${row.points})`;
     })
     .join("\n");
 }
 
-function formatPrematureRows(rows: Awaited<ReturnType<typeof getTodaysLeets>>) {
+function formatPrematureRows(rows: ScoredMessage[]) {
   return rows
     .map((row) => {
-      const { seconds, ms } = getTimeParts(slackTsToDate(row.ts));
+      const { seconds, ms } = getTimeParts(slackTsToDate(row.message.ts));
       const negativeOffset = 1000 - ms;
-      return `:letogun: <@${row.message.user}>: -${negativeOffset}ms for tidlig :hot_face:`;
+      return `:letogun: <@${row.message.message.user}>: -${negativeOffset}ms for tidlig :hot_face: (${row.points})`;
     })
     .join("\n");
 }
 
-function formatLateRows(rows: Awaited<ReturnType<typeof getTodaysLeets>>) {
+function formatLateRows(rows: ScoredMessage[]) {
   return rows
     .map((row) => {
-      const date = slackTsToDate(row.ts);
+      const date = slackTsToDate(row.message.ts);
       const { minutes, seconds } = getTimeParts(date);
       return `:letoint: <@${
-        row.message.user
-      }>: ${minutes}m ${seconds}s (${formatHours(date)})`;
+        row.message.message.user
+      }>: ${minutes}m ${seconds}s (${formatHours(date)}) (+${row.points})`;
     })
     .join("\n");
 }
 
-function messageFormatters(rows: Awaited<ReturnType<typeof getTodaysLeets>>) {
+function messageFormatters(rows: ScoredMessage[]) {
   return rows
     .map((row) => {
       const leet = set(new Date(), {
@@ -57,19 +61,19 @@ function messageFormatters(rows: Awaited<ReturnType<typeof getTodaysLeets>>) {
         milliseconds: 0,
       });
 
-      const date = slackTsToDate(row.ts);
-      return `:letoshake: <@${row.message.user}>: ${formatDistanceStrict(
+      const date = slackTsToDate(row.message.ts);
+      return `:letoshake: <@${row.message.message.user}>: ${formatDistanceStrict(
         leet,
         date,
         {
           locale: nb,
         },
-      )} bom :roflrofl: (${formatHours(date)})`;
+      )} bom :roflrofl: (${formatHours(date)}) (+${row.points})`;
     })
     .join("\n");
 }
 
-export function toCategoryMarkdown([key, rows]) {
+export function toCategoryMarkdown([key, rows]: StatusScoredMessageTuple) {
   switch (key) {
     case "leetos":
       return `*Ekte leetos*:\n${formatLeetos(rows)}`;
