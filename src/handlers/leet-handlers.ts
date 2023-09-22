@@ -9,7 +9,8 @@ import {
   insertNewBotMessage,
 } from "../db/queries";
 
-import { leetsToBlocks } from "./daily-leet/block-builder";
+import { scoredDayToBlocks } from "./daily-leet/block-builder";
+import { scoreDay } from "./score-engine";
 
 export function configureLeetHandlers(app: App) {
   app.message("1337", async ({ message, say, event, client }) => {
@@ -72,12 +73,10 @@ export function configureLeetHandlers(app: App) {
 }
 
 export async function postOrUpdate(client: WebClient, channelId: string) {
-  const { hour, minutes, seconds } = getTimeParts(new Date());
-
   console.log("Posting or updating");
   const existingTS = await getCurrentBotMessageTS(channelId);
-  const todaysLeets = await getTodaysLeets(channelId);
-  const blocks = leetsToBlocks(hour, minutes, seconds, todaysLeets);
+  const scoredDay = await scoreDay(new Date(), channelId);
+  const blocks = scoredDayToBlocks(scoredDay);
 
   if (existingTS) {
     console.log(`Found existing ts: ${existingTS}`);
