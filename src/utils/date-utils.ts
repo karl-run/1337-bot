@@ -42,8 +42,17 @@ export const slackTsToSeconds: (ts: string) => number = R.createPipe(
   getSeconds,
 );
 
+export const slackTsToDay: (ts: string) => number = R.createPipe(
+  slackTsToDate,
+  getDate,
+);
+
 export function formatHours(time: Date) {
   return format(time, "HH:mm", { timeZone: OSLO_TZ });
+}
+
+export function getMonthName(date: Date): string {
+  return format(date, "MMMM", { locale: nbLocale });
 }
 
 export function formatHoursWithSeconds(time: Date) {

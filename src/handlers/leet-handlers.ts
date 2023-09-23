@@ -4,13 +4,14 @@ import { App, GenericMessageEvent } from "@slack/bolt";
 import { formatHours, getTimeParts, slackTsToDate } from "../utils/date-utils";
 import {
   getCurrentBotMessageTS,
-  getTodaysLeets,
+  getLeetForDay,
   insertLeetMessage,
   insertNewBotMessage,
 } from "../db/queries";
 
 import { scoredDayToBlocks } from "./daily-leet/block-builder";
-import { scoreDay } from "./score-engine";
+import { scoreDay } from "./score-engine/score-day";
+import { UserLeetRow } from "../db/types";
 
 export function configureLeetHandlers(app: App) {
   app.message("1337", async ({ message, say, event, client }) => {
@@ -75,7 +76,8 @@ export function configureLeetHandlers(app: App) {
 export async function postOrUpdate(client: WebClient, channelId: string) {
   console.log("Posting or updating");
   const existingTS = await getCurrentBotMessageTS(channelId);
-  const scoredDay = await scoreDay(new Date(), channelId);
+  const leetsForDay: UserLeetRow[] = await getLeetForDay(channelId, new Date());
+  const scoredDay = scoreDay(leetsForDay);
   const blocks = scoredDayToBlocks(scoredDay);
 
   if (existingTS) {

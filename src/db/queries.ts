@@ -73,11 +73,27 @@ export async function getLeetForDay(channelId: string, day: Date) {
   const queryResult = await client.query(
     `
         SELECT *
-        FROM public.leet_messages
+        FROM leet_messages
         WHERE channel = $1
           AND date(ts_as_date) = $2::date;
     `,
     [channelId, day],
+  );
+
+  return queryResult.rows as UserLeetRow[];
+}
+
+export async function getLeetsForMonth(channelId: string, month: Date) {
+  const queryResult = await client.query(
+    `
+        SELECT *
+        FROM leet_messages
+        WHERE channel = $1
+          AND EXTRACT(MONTH FROM ts_as_date) = EXTRACT(MONTH FROM $2::date)
+          AND EXTRACT(YEAR FROM ts_as_date) = EXTRACT(YEAR FROM $2::date)
+        ORDER BY ts_as_date DESC;
+    `,
+    [channelId, month],
   );
 
   return queryResult.rows as UserLeetRow[];

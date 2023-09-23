@@ -62,13 +62,11 @@ function messageFormatters(rows: ScoredMessage[]) {
       });
 
       const date = slackTsToDate(row.message.ts);
-      return `:letoshake: <@${row.message.message.user}>: ${formatDistanceStrict(
-        leet,
-        date,
-        {
-          locale: nb,
-        },
-      )} bom :roflrofl: (${formatHours(date)}) (+${row.points})`;
+      return `:letoshake: <@${
+        row.message.message.user
+      }>: ${formatDistanceStrict(leet, date, {
+        locale: nb,
+      })} bom :roflrofl: (${formatHours(date)}) (+${row.points})`;
     })
     .join("\n");
 }

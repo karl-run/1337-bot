@@ -1,8 +1,9 @@
 import { App } from "@slack/bolt";
 import { postOrUpdate } from "./leet-handlers";
 import { getTopBlocks } from "./top-10";
-import { getTimeParts } from "../utils/date-utils";
+import { getMonthName, getTimeParts } from "../utils/date-utils";
 import { getTopStreak } from "./streak";
+import { getMonthlyScoreboardBlocks } from "./score-engine/blocks-month";
 
 export function configureCommandHandlers(app: App) {
   app.command(
@@ -29,6 +30,7 @@ export function configureCommandHandlers(app: App) {
   app.command(
     "/1337-streaks",
     async ({ command, ack, say, client, context }) => {
+      await ack();
       const topStreaksBlocks = await getTopStreak(command.channel_id);
 
       await say({
@@ -42,6 +44,33 @@ export function configureCommandHandlers(app: App) {
               {
                 type: "mrkdwn",
                 text: `Denne top streaks-listen er bestilt av <@${command.user_id}>`,
+              },
+            ],
+          },
+        ],
+      });
+    },
+  );
+
+  app.command(
+    "/1337-scoreboard",
+    async ({ command, ack, say, client, context }) => {
+      await ack();
+      const scoreBoardBlocks = await getMonthlyScoreboardBlocks(
+        command.channel_id,
+      );
+
+      await say({
+        text: `Scoreboard for ${getMonthName(new Date())}`,
+        channel: command.channel_id,
+        blocks: [
+          ...scoreBoardBlocks,
+          {
+            type: "context",
+            elements: [
+              {
+                type: "mrkdwn",
+                text: `Dette scoreboardet er bestilt av <@${command.user_id}>`,
               },
             ],
           },
