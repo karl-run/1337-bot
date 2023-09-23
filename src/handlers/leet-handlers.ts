@@ -1,7 +1,12 @@
 import { WebClient } from "@slack/web-api";
 import { App, GenericMessageEvent } from "@slack/bolt";
 
-import { formatHours, getTimeParts, slackTsToDate } from "../utils/date-utils";
+import {
+  formatHours,
+  getMonthName,
+  getTimeParts,
+  slackTsToDate,
+} from "../utils/date-utils";
 import {
   getCurrentBotMessageTS,
   getLeetForDay,
@@ -12,6 +17,7 @@ import {
 import { scoredDayToBlocks } from "./daily-leet/block-builder";
 import { scoreDay } from "./score-engine/score-day";
 import { UserLeetRow } from "../db/types";
+import { getMonthlyScoreboardBlocks } from "./score-engine/blocks-month";
 
 export function configureLeetHandlers(app: App) {
   app.message("1337", async ({ message, say, event, client }) => {
@@ -89,17 +95,24 @@ export async function postOrUpdate(client: WebClient, channelId: string) {
       text: "Dagens leets",
       blocks,
     });
-  } else {
-    console.log("No existing ts found");
-
-    const postedMessage = await client.chat.postMessage({
-      channel: channelId,
-      text: "Dagens leets",
-      blocks,
-    });
-
-    console.log(`Posted message ${postedMessage.ts}`);
-
-    await insertNewBotMessage(postedMessage.ts, channelId);
+    return;
   }
+
+  console.log("No existing ts found");
+  const postedMessage = await client.chat.postMessage({
+    channel: channelId,
+    text: "Dagens leets",
+    blocks,
+  });
+
+  console.log(`Posted message ${postedMessage.ts}`);
+  await insertNewBotMessage(postedMessage.ts, channelId);
+
+  // Post current scoreboard to thread
+  await client.chat.postMessage({
+    text: `Scoreboard for ${getMonthName(new Date())}`,
+    channel: channelId,
+    thread_ts: postedMessage.ts,
+    blocks: await getMonthlyScoreboardBlocks(channelId),
+  });
 }
