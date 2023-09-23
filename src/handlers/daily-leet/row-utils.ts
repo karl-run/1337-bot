@@ -8,6 +8,10 @@ export function rowToStatus(
 ): LeetStatus {
   const timeParts = getTimeParts(slackTsToDate(row.ts));
 
+  if (timeParts.hour !== 13) {
+    return "garbage";
+  }
+
   if (timeParts.minutes === 37 && timeParts.seconds === 0) {
     return "leetos";
   } else if (timeParts.minutes === 37) {
