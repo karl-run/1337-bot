@@ -26,5 +26,6 @@ export async function scoreMonth(channelId: string, date: Date) {
     })),
     R.values,
     R.sortBy([(it) => it.monthlyScore, "desc"]),
+    R.filter((it) => it.items.filter((it) => it.score !== 0).length > 0),
   );
 }

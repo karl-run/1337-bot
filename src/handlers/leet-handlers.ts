@@ -113,6 +113,6 @@ export async function postOrUpdate(client: WebClient, channelId: string) {
     text: `Scoreboard for ${getMonthName(new Date())}`,
     channel: channelId,
     thread_ts: postedMessage.ts,
-    blocks: await getMonthlyScoreboardBlocks(channelId),
+    blocks: await getMonthlyScoreboardBlocks(channelId, new Date()),
   });
 }

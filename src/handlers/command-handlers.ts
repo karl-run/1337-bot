@@ -58,6 +58,7 @@ export function configureCommandHandlers(app: App) {
       await ack();
       const scoreBoardBlocks = await getMonthlyScoreboardBlocks(
         command.channel_id,
+        new Date(),
       );
 
       await say({

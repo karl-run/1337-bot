@@ -3,7 +3,7 @@ import { getTodaysLeets } from "../../db/queries";
 
 export type LeetStatus = "leetos" | "leet" | "premature" | "late" | "garbage";
 
-export function rowToStatus(
+export function classifyRow(
   row: Awaited<ReturnType<typeof getTodaysLeets>>[number],
 ): LeetStatus {
   const timeParts = getTimeParts(slackTsToDate(row.ts));

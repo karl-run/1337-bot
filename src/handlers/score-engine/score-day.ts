@@ -1,5 +1,5 @@
 import * as R from "remeda";
-import { LeetStatus, rowToStatus } from "../daily-leet/row-utils";
+import { LeetStatus, classifyRow } from "../daily-leet/row-utils";
 import { UserLeetRow } from "../../db/types";
 import { slackTsToMs, slackTsToSeconds } from "../../utils/date-utils";
 
@@ -9,7 +9,7 @@ export function scoreDay(leetsForDay: UserLeetRow[]): ScoredDay {
   return R.pipe(
     leetsForDay,
     R.sortBy((row) => row.ts),
-    R.groupBy(rowToStatus),
+    R.groupBy(classifyRow),
     (it) =>
       R.merge(
         {
