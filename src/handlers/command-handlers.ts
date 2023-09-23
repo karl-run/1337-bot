@@ -4,6 +4,7 @@ import { getTopBlocks } from "../leet/top-10";
 import { getMonthName, getTimeParts } from "../utils/date-utils";
 import { getTopStreak } from "../leet/streak";
 import { getMonthlyScoreboardBlocks } from "../leet/score-engine/blocks-month";
+import { getAllTimeBlocks } from "../leet/score-engine/blocks-all";
 
 export function configureCommandHandlers(app: App) {
   app.command(
@@ -58,14 +59,19 @@ export function configureCommandHandlers(app: App) {
       await ack();
 
       const detailed = command.text.trim() === "details";
-      const scoreBoardBlocks = await getMonthlyScoreboardBlocks(
-        command.channel_id,
-        new Date(),
-        detailed,
-      );
+      const all = command.text.trim() === "all";
+      const scoreBoardBlocks = all
+        ? await getAllTimeBlocks(command.channel_id)
+        : await getMonthlyScoreboardBlocks(
+            command.channel_id,
+            new Date(),
+            detailed,
+          );
 
       await say({
-        text: `Scoreboard for ${getMonthName(new Date())}`,
+        text: all
+          ? "Scoreboard for all time"
+          : `Scoreboard for ${getMonthName(new Date())}`,
         channel: command.channel_id,
         blocks: [
           ...scoreBoardBlocks,

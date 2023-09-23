@@ -14,7 +14,7 @@ import nbLocale from "date-fns/locale/nb";
 
 const OSLO_TZ = "Europe/Oslo";
 
-export function slackTsToDate(ts: string): Date {
+export function slackTsToDate(ts: string | number): Date {
   return utcToZonedTime(new Date(+ts * 1000), OSLO_TZ);
 }
 

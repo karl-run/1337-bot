@@ -40,42 +40,39 @@ export async function getMonthlyScoreboardBlocks(
               text: scoredMonth
                 .map(
                   (it, index) =>
-                    `${index + 1}. <@${it.user}>: *${it.monthlyScore}*`,
+                    `${index + 1}. <@${it.user}>: *${it.scoreSum}*`,
                 )
                 .join("\n"),
             },
           } satisfies KnownBlock,
         ]
-      : scoredMonth.flatMap((user, index) => {
-          console.log("wtf???", user);
-          return [
-            {
-              type: "section",
-              text: {
-                type: "mrkdwn",
-                text: `${index + 1}. <@${user.user}>: *${user.monthlyScore}*`,
-              },
-            } satisfies KnownBlock,
-            {
-              type: "section",
-              text: {
-                type: "mrkdwn",
-                text: user.items
-                  .filter((it) => it.score !== 0)
-                  .map(
-                    (it) =>
-                      ` - ${slackTsToDay(it.ts)}. \`${scoreWithPlus(
-                        it.score,
-                      )}\`: ${it.text} (<${createPermalink(
-                        channelId,
-                        it.ts,
-                      )}|link>)`,
-                  )
-                  .join("\n"),
-              },
-            } satisfies KnownBlock,
-          ];
-        })),
+      : scoredMonth.flatMap((user, index) => [
+          {
+            type: "section",
+            text: {
+              type: "mrkdwn",
+              text: `${index + 1}. <@${user.user}>: *${user.scoreSum}*`,
+            },
+          } satisfies KnownBlock,
+          {
+            type: "section",
+            text: {
+              type: "mrkdwn",
+              text: user.items
+                .filter((it) => it.score !== 0)
+                .map(
+                  (it) =>
+                    ` - ${slackTsToDay(it.ts)}. \`${scoreWithPlus(
+                      it.score,
+                    )}\`: ${it.text} (<${createPermalink(
+                      channelId,
+                      it.ts,
+                    )}|link>)`,
+                )
+                .join("\n"),
+            },
+          } satisfies KnownBlock,
+        ])),
   ];
 }
 
