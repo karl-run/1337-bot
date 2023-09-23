@@ -3,7 +3,7 @@ import { LeetStatus, classifyRow } from "../daily-leet/row-utils";
 import { UserLeetRow } from "../../db/types";
 import { slackTsToMs, slackTsToSeconds } from "../../utils/date-utils";
 
-import { ScoredDay, ScoredMessage } from "./";
+import { ScoredDay, ScoredMessage } from "./index";
 
 export function scoreDay(leetsForDay: UserLeetRow[]): ScoredDay {
   return R.pipe(

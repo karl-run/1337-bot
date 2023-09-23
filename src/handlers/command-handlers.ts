@@ -1,9 +1,9 @@
 import { App } from "@slack/bolt";
 import { postOrUpdate } from "./leet-handlers";
-import { getTopBlocks } from "./top-10";
+import { getTopBlocks } from "../leet/top-10";
 import { getMonthName, getTimeParts } from "../utils/date-utils";
-import { getTopStreak } from "./streak";
-import { getMonthlyScoreboardBlocks } from "./score-engine/blocks-month";
+import { getTopStreak } from "../leet/streak";
+import { getMonthlyScoreboardBlocks } from "../leet/score-engine/blocks-month";
 
 export function configureCommandHandlers(app: App) {
   app.command(

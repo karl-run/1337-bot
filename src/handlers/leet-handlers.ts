@@ -14,10 +14,10 @@ import {
   insertNewBotMessage,
 } from "../db/queries";
 
-import { scoredDayToBlocks } from "./daily-leet/block-builder";
-import { scoreDay } from "./score-engine/score-day";
+import { scoredDayToBlocks } from "../leet/daily-leet/block-builder";
+import { scoreDay } from "../leet/score-engine/score-day";
 import { UserLeetRow } from "../db/types";
-import { getMonthlyScoreboardBlocks } from "./score-engine/blocks-month";
+import { getMonthlyScoreboardBlocks } from "../leet/score-engine/blocks-month";
 
 export function configureLeetHandlers(app: App) {
   app.message("1337", async ({ message, say, event, client }) => {
