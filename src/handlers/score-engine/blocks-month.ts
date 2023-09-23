@@ -1,5 +1,5 @@
 import { KnownBlock } from "@slack/bolt";
-import { getMonthName } from "../../utils/date-utils";
+import { getMonthName, slackTsToDay } from "../../utils/date-utils";
 import { scoreMonth } from "./score-month";
 import { createPermalink } from "../../utils/slack-utils";
 
@@ -49,7 +49,9 @@ export async function getMonthlyScoreboardBlocks(
                 .filter((it) => it.score > 0)
                 .map(
                   (it) =>
-                    ` - ${it.score}: ${it.text} (<${createPermalink(
+                    ` - ${slackTsToDay(it.ts)}. \`${scoreWithPlus(
+                      it.score,
+                    )}\`: ${it.text} (<${createPermalink(
                       channelId,
                       it.ts,
                     )}|link>)`,
@@ -60,3 +62,5 @@ export async function getMonthlyScoreboardBlocks(
         ])),
   ];
 }
+
+const scoreWithPlus = (score: number) => (score > 0 ? `+${score}` : score);
