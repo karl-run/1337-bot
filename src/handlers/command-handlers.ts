@@ -56,9 +56,12 @@ export function configureCommandHandlers(app: App) {
     "/1337-scoreboard",
     async ({ command, ack, say, client, context }) => {
       await ack();
+
+      const detailed = command.text.trim() === "details";
       const scoreBoardBlocks = await getMonthlyScoreboardBlocks(
         command.channel_id,
         new Date(),
+        detailed,
       );
 
       await say({
