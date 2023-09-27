@@ -9,6 +9,7 @@ import {
   isSameDay,
   isSameMonth,
   isSameYear,
+  parse,
 } from "date-fns";
 import nbLocale from "date-fns/locale/nb";
 
@@ -46,6 +47,10 @@ export const slackTsToDay: (ts: string) => number = R.createPipe(
   slackTsToDate,
   getDate,
 );
+
+export function parseYearMonth(value: string) {
+  return parse(value, "yyyy.MM", new Date(), { locale: nbLocale });
+}
 
 export function formatHours(time: Date) {
   return format(time, "HH:mm", { timeZone: OSLO_TZ });
