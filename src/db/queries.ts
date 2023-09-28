@@ -107,7 +107,7 @@ export async function getLeetsForWeek(channelId: string, month: Date) {
         WHERE channel = $1
           AND ts_as_date >= date_trunc('week', NOW());
     `,
-    [channelId, month],
+    [channelId],
   );
 
   return queryResult.rows as UserLeetRow[];
