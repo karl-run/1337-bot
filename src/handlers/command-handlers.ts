@@ -49,6 +49,11 @@ export function createParser(
             type: "boolean",
             description: "show all time scoreboard",
           })
+          .option("week", {
+            type: "boolean",
+            description: "show this weeks scoreboard",
+            conflicts: "all",
+          })
           .option("detailed", {
             type: "boolean",
             conflicts: "all",
@@ -71,6 +76,7 @@ export function createParser(
         return commands.handleScoreboard(command, client, {
           allTime: yargs.all ?? null,
           detailed: yargs.detailed ?? null,
+          week: yargs.week ?? null,
           month: yargs.month ?? null,
         });
       },
@@ -81,7 +87,7 @@ export function createParser(
 }
 
 export function configureCommandHandlers(app: App) {
-  app.command("/1337", async ({ command, ack, say, client, context }) => {
+  app.command("/1337", async ({ command, ack, client }) => {
     await ack();
 
     const parser = createParser(command, client, commands);

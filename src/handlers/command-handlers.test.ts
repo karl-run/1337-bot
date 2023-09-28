@@ -83,6 +83,7 @@ describe("args parsing", () => {
     expect(lastParam(mocks.handleScoreboard)).toEqual({
       allTime: null,
       detailed: null,
+      week: null,
       month: null,
     });
   });
@@ -94,6 +95,7 @@ describe("args parsing", () => {
     expect(lastParam(mocks.handleScoreboard)).toEqual({
       allTime: true,
       detailed: null,
+      week: null,
       month: null,
     });
   });
@@ -105,6 +107,7 @@ describe("args parsing", () => {
     expect(lastParam(mocks.handleScoreboard)).toEqual({
       allTime: null,
       detailed: null,
+      week: null,
       month: "2023.06",
     });
   });
@@ -124,6 +127,7 @@ describe("args parsing", () => {
     expect(lastParam(mocks.handleScoreboard)).toEqual({
       allTime: null,
       detailed: true,
+      week: null,
       month: null,
     });
   });
@@ -135,6 +139,7 @@ describe("args parsing", () => {
     expect(lastParam(mocks.handleScoreboard)).toEqual({
       allTime: null,
       detailed: true,
+      week: null,
       month: "2023.07",
     });
   });
@@ -163,6 +168,12 @@ describe("args parsing", () => {
       expect(doParse).toThrow(
         "Arguments detailed and all are mutually exclusive",
       );
+    });
+
+    test("all+week combinations", async () => {
+      const doParse = async () => await testParse("scoreboard --all --week");
+
+      expect(doParse).toThrow("Arguments week and all are mutually exclusive");
     });
   });
 });

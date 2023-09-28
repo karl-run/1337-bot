@@ -4,6 +4,7 @@ import { SlashCommand } from "@slack/bolt";
 import {
   getMonthName,
   getTimeParts,
+  getWeekNumber,
   parseYearMonth,
 } from "../utils/date-utils";
 import { getMonthlyScoreboardBlocks } from "../leet/score-engine/blocks-month";
@@ -11,8 +12,8 @@ import { getAllTimeBlocks } from "../leet/score-engine/blocks-all";
 import { getTopStreak } from "../leet/streak";
 import { getTopBlocks } from "../leet/top-10";
 
-
-import {postOrUpdateDailyLeets} from "../slack/daily";
+import { postOrUpdateDailyLeets } from "../slack/daily";
+import { getWeeklyScoreboardBlocks } from "../leet/score-engine/blocks-week";
 
 export type Commands = typeof commands;
 export const commands = {
@@ -97,15 +98,19 @@ export const commands = {
     {
       allTime,
       month,
+      week,
       detailed,
     }: {
       allTime: boolean | null;
       detailed: boolean | null;
+      week: boolean | null;
       month: string | null;
     },
   ) {
     const scoreBoardBlocks = allTime
       ? await getAllTimeBlocks(command.channel_id)
+      : week
+      ? await getWeeklyScoreboardBlocks(command.channel_id, new Date())
       : await getMonthlyScoreboardBlocks(
           command.channel_id,
           month ? parseYearMonth(month) : new Date(),
@@ -115,6 +120,8 @@ export const commands = {
     await client.chat.postMessage({
       text: allTime
         ? "Scoreboard for all time"
+        : week
+        ? `Scoreboard for uke ${getWeekNumber(new Date())}`
         : `Scoreboard for ${getMonthName(new Date())}`,
       channel: command.channel_id,
       blocks: [
