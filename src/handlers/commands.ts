@@ -11,7 +11,8 @@ import { getAllTimeBlocks } from "../leet/score-engine/blocks-all";
 import { getTopStreak } from "../leet/streak";
 import { getTopBlocks } from "../leet/top-10";
 
-import { postOrUpdate } from "./leet-handlers";
+
+import {postOrUpdateDailyLeets} from "../slack/daily";
 
 export type Commands = typeof commands;
 export const commands = {
@@ -19,7 +20,7 @@ export const commands = {
     const { hour, minutes } = getTimeParts(new Date());
 
     if ((hour === 13 && minutes >= 37) || hour > 13) {
-      await postOrUpdate(client, command.channel_id);
+      await postOrUpdateDailyLeets(client, command.channel_id);
 
       return;
     }

@@ -99,6 +99,20 @@ export async function getLeetsForMonth(channelId: string, month: Date) {
   return queryResult.rows as UserLeetRow[];
 }
 
+export async function getLeetsForWeek(channelId: string, month: Date) {
+  const queryResult = await client.query(
+    `
+        SELECT *
+        FROM leet_messages
+        WHERE channel = $1
+          AND ts_as_date >= date_trunc('week', NOW());
+    `,
+    [channelId, month],
+  );
+
+  return queryResult.rows as UserLeetRow[];
+}
+
 export async function getAllLeets(channelId: string): Promise<UserLeetRow[]> {
   const queryResult = await client.query(
     `

@@ -6,6 +6,7 @@ import {
   getMilliseconds,
   getMinutes,
   getSeconds,
+  getWeek,
   isSameDay,
   isSameMonth,
   isSameYear,
@@ -58,6 +59,10 @@ export function formatHours(time: Date) {
 
 export function getMonthName(date: Date): string {
   return format(date, "MMMM", { locale: nbLocale });
+}
+
+export function getWeekNumber(date: Date): number {
+  return getWeek(date, { weekStartsOn: 1, locale: nbLocale });
 }
 
 export function formatHoursWithSeconds(time: Date) {

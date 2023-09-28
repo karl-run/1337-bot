@@ -1,23 +1,8 @@
-import { WebClient } from "@slack/web-api";
 import { App, GenericMessageEvent } from "@slack/bolt";
 
-import {
-  formatHours,
-  getMonthName,
-  getTimeParts,
-  slackTsToDate,
-} from "../utils/date-utils";
-import {
-  getCurrentBotMessageTS,
-  getLeetForDay,
-  insertLeetMessage,
-  insertNewBotMessage,
-} from "../db/queries";
-
-import { scoredDayToBlocks } from "../leet/daily-leet/block-builder";
-import { scoreDay } from "../leet/score-engine/score-day";
-import { UserLeetRow } from "../db/types";
-import { getMonthlyScoreboardBlocks } from "../leet/score-engine/blocks-month";
+import { formatHours, getTimeParts, slackTsToDate } from "../utils/date-utils";
+import { insertLeetMessage } from "../db/queries";
+import { postOrUpdateDailyLeets } from "../slack/daily";
 
 export function configureLeetHandlers(app: App) {
   app.message("1337", async ({ message, say, event, client }) => {
@@ -37,7 +22,7 @@ export function configureLeetHandlers(app: App) {
 
     // Only update bot-summary after 13:38+
     if ((hour === 13 && minutes > 37) || hour > 13) {
-      await postOrUpdate(client, event.channel);
+      await postOrUpdateDailyLeets(client, event.channel);
     }
 
     const isLeet = hour === 13 && minutes === 37;
@@ -79,40 +64,3 @@ export function configureLeetHandlers(app: App) {
   });
 }
 
-export async function postOrUpdate(client: WebClient, channelId: string) {
-  console.log("Posting or updating");
-  const existingTS = await getCurrentBotMessageTS(channelId);
-  const leetsForDay: UserLeetRow[] = await getLeetForDay(channelId, new Date());
-  const scoredDay = scoreDay(leetsForDay);
-  const blocks = scoredDayToBlocks(scoredDay);
-
-  if (existingTS) {
-    console.log(`Found existing ts: ${existingTS}`);
-
-    await client.chat.update({
-      channel: channelId,
-      ts: existingTS,
-      text: "Dagens leets",
-      blocks,
-    });
-    return;
-  }
-
-  console.log("No existing ts found");
-  const postedMessage = await client.chat.postMessage({
-    channel: channelId,
-    text: "Dagens leets",
-    blocks,
-  });
-
-  console.log(`Posted message ${postedMessage.ts}`);
-  await insertNewBotMessage(postedMessage.ts, channelId);
-
-  // Post current scoreboard to thread
-  await client.chat.postMessage({
-    text: `Scoreboard for ${getMonthName(new Date())}`,
-    channel: channelId,
-    thread_ts: postedMessage.ts,
-    blocks: await getMonthlyScoreboardBlocks(channelId, new Date()),
-  });
-}
