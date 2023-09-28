@@ -7,34 +7,83 @@ import { getTime } from "date-fns";
 
 describe("score engine", () => {
   test("a single 2ms leet should give 2498 points", async () => {
-    const result = await scoreLeets([
+    const [userA] = await scoreLeets([
       createLeet("user", "1337", createLeetooDate(2)),
     ]);
 
     // First bonus: 500
     // Leetoo bonus: 1000
     // Time bonus: 1000 - 2 = 998
-    expect(result[0].scoreSum).toBe(2498);
+    expect(userA.scoreSum).toBe(2498);
   });
 
   test("a single 1.5 second leet should give 2498 points", async () => {
-    const result = await scoreLeets([
+    const [userA] = await scoreLeets([
       createLeet("user", "1337", createLeetDate(1.5)),
     ]);
 
     // First bonus: 500
     // Sub 3 second bonus 250
-    expect(result[0].scoreSum).toBe(750);
+    expect(userA.scoreSum).toBe(750);
   });
 
   test("a single 37 second leet should give 527 points", async () => {
-    const result = await scoreLeets([
+    const [userA] = await scoreLeets([
       createLeet("user", "1337", createLeetDate(37)),
     ]);
 
     // First bonus: 500
     // Post 3 second bonus 27
-    expect(result[0].scoreSum).toBe(527);
+    expect(userA.scoreSum).toBe(527);
+  });
+});
+
+describe.skip("score engine - multiple leets", () => {
+  test("only the leetoo should count", async () => {
+    const [userA] = await scoreLeets([
+      createLeet("user", "1337", createLeetooDate(123)),
+      createLeet("user", "1337", createLeetDate(47)),
+    ]);
+
+    expect(userA.scoreSum).toBe(2377);
+  });
+
+  test("only the premature should count (leetoo)", async () => {
+    const [userA] = await scoreLeets([
+      createLeet("user", "1337", createPrematureDate(12)),
+      createLeet("user", "1337", createLeetooDate(2)),
+    ]);
+
+    expect(userA.scoreSum).toBe(-5000);
+  });
+
+  test("only the premature should count (leet)", async () => {
+    const [userA] = await scoreLeets([
+      createLeet("user", "1337", createPrematureDate(12)),
+      createLeet("user", "1337", createLeetDate(2)),
+    ]);
+
+    expect(userA.scoreSum).toBe(-5000);
+  });
+
+  test("only the first leet should count", async () => {
+    const [userA] = await scoreLeets([
+      createLeet("user", "1337", createLeetDate(4)),
+      createLeet("user", "1337", createLeetDate(5)),
+      createLeet("user", "1337", createLeetDate(6)),
+      createLeet("user", "1337", createLeetDate(7)),
+    ]);
+
+    expect(userA.scoreSum).toBe(500 + 27);
+  });
+
+  test("only the first leet should count (sub 3s)", async () => {
+    const [userA] = await scoreLeets([
+      createLeet("user", "1337", createLeetDate(1.5)),
+      createLeet("user", "1337", createLeetDate(7)),
+    ]);
+
+    expect(userA.scoreSum).toBe(500 + 250);
   });
 });
 
@@ -47,6 +96,10 @@ function createLeet(user: string, text: string, ts: Date): UserLeetRow {
       text,
     } as UserLeetRow["message"],
   } as UserLeetRow;
+}
+
+function createPrematureDate(ms: number): Date {
+  return new Date(2023, 5, 6, 13 - 2, 36, 59, 1000 - ms);
 }
 
 function createLeetooDate(ms: number): Date {
