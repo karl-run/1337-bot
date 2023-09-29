@@ -2,8 +2,6 @@ name: Publish Image
 
 on:
   push:
-    branches:
-      - main
 
 env:
   REGISTRY: ghcr.io
@@ -19,7 +17,17 @@ jobs:
       - run: bun run tsc
       - run: bun test
 
+  build-for-branches:
+    if: github.ref != 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: oven-sh/setup-bun@v1
+      - run: bun install --frozen-lockfile
+      - run: bun run build
+
   build-and-push-image:
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     permissions:
       contents: read
