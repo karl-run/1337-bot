@@ -32,7 +32,7 @@ export function configureLeetHandlers(app: App) {
         thread_ts: message.ts,
         text: `Premature leetjaculation <@${
           (message as any).user
-        }>!!! Du var ${negativeOffset}ms for tidlig :hot_face:`,
+        }>!!! Du var ${negativeOffset} millisekunder for tidlig! :hot_face:`,
       });
       return;
     }
@@ -42,9 +42,9 @@ export function configureLeetHandlers(app: App) {
 
       await say({
         thread_ts: message.ts,
-        text: `En ekte leetoo <@${
+        text: `En ekte leetoo, <@${
           (message as any).user
-        }>! :leetoo: Du var ${ms}ms inn i sekundet.`,
+        }>! :leetoo: Du var ${ms} millisekunder inn i sekundet.`,
       });
     } else if (isLeet) {
       await say({
@@ -58,7 +58,7 @@ export function configureLeetHandlers(app: App) {
         thread_ts: message.ts,
         text: `<@${(message as any).user}>, ${formatHours(
           time,
-        )} is not 13:37. This Incident Will Be Reported`,
+        )} is not 13:37. This Incident Will Be Reported.`,
       });
     }
   });
