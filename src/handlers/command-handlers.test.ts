@@ -12,6 +12,7 @@ describe("args parsing", () => {
     handleDebougge: mock(),
     handleStreaks: mock(),
     handleTop: mock(),
+    handlePremature: mock(),
   };
 
   const testParse = createTestParser(mocks);
@@ -21,6 +22,7 @@ describe("args parsing", () => {
     (mocks.handleDebougge as Mock).mockReset();
     (mocks.handleStreaks as Mock).mockReset();
     (mocks.handleTop as Mock).mockReset();
+    (mocks.handlePremature as Mock).mockReset();
   });
 
   test("--help should give help", async () => {
@@ -174,6 +176,22 @@ describe("args parsing", () => {
       const doParse = async () => await testParse("scoreboard --all --week");
 
       expect(doParse).toThrow("Arguments week and all are mutually exclusive");
+    });
+  });
+
+  describe("premature", () => {
+    test("premature should handle premature base case", async () => {
+      await testParse("premature");
+
+      expect(mocks.handlePremature).toHaveBeenCalledTimes(1);
+      expect(lastParam(mocks.handlePremature)).toEqual(false);
+    });
+
+    test("premature should handle premature with --worst", async () => {
+      await testParse("premature --worst");
+
+      expect(mocks.handlePremature).toHaveBeenCalledTimes(1);
+      expect(lastParam(mocks.handlePremature)).toEqual(true);
     });
   });
 });

@@ -31,6 +31,24 @@ export async function getTopBlocks(
   return buildBlocks(channelId, topN, count);
 }
 
+export async function getPrematures(
+  channelId: string,
+  direction: "asc" | "desc" = "asc",
+  count: number = 10,
+): Promise<KnownBlock[]> {
+  const messages: DateMessageTuple[] = (await db.getAllLeets(channelId))
+    .map((it): DateMessageTuple => [slackTsToDate(it.ts), it.message])
+    .filter(([date]) => date.getHours() === 13 && date.getMinutes() === 36);
+
+  const topN: DateMessageTuple[] = R.pipe(
+    messages,
+    R.sortBy([([date]) => date.getMilliseconds(), direction]),
+    R.take(count),
+  );
+
+  return buildBlocks(channelId, topN, count);
+}
+
 function buildBlocks(
   channelId: string,
   messages: DateMessageTuple[],

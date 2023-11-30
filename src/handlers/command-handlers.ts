@@ -41,6 +41,18 @@ export function createParser(
       },
     )
     .command(
+      "premature",
+      "gets the top 10 closest, but premature, e.g: `/1337 premature`",
+      (yargs) =>
+        yargs.option("worst", {
+          type: "boolean",
+          description: "give the worst premature leets instead of the closest",
+        }),
+      (args) => {
+        return commands.handlePremature(command, client, args.worst ?? false);
+      },
+    )
+    .command(
       "scoreboard",
       "gets the scoreboard, either all time or detailed for current month",
       (yargs) =>

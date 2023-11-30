@@ -10,7 +10,7 @@ import {
 import { getMonthlyScoreboardBlocks } from "../leet/score-engine/blocks-month";
 import { getAllTimeBlocks } from "../leet/score-engine/blocks-all";
 import { getTopStreak } from "../leet/streak";
-import { getTopBlocks } from "../leet/top-10";
+import { getPrematures, getTopBlocks } from "../leet/top-10";
 
 import { postOrUpdateDailyLeets } from "../slack/daily";
 import { getWeeklyScoreboardBlocks } from "../leet/score-engine/blocks-week";
@@ -47,6 +47,34 @@ export const commands = {
             {
               type: "mrkdwn",
               text: `Denne top streaks-listen er bestilt av <@${command.user_id}>`,
+            },
+          ],
+        },
+      ],
+    });
+  },
+
+  async handlePremature(
+    command: SlashCommand,
+    client: WebClient,
+    worst: boolean,
+  ) {
+    const prematureBlocks = await getPrematures(
+      command.channel_id,
+      worst ? "asc" : "desc",
+    );
+
+    await client.chat.postMessage({
+      text: "Top 10 premature leets",
+      channel: command.channel_id,
+      blocks: [
+        ...prematureBlocks,
+        {
+          type: "context",
+          elements: [
+            {
+              type: "mrkdwn",
+              text: `Denne top 10 premature listen er bestilt av <@${command.user_id}>`,
             },
           ],
         },
