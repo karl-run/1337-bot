@@ -28,7 +28,7 @@ export async function getTopBlocks(
     R.take(count),
   );
 
-  return buildBlocks(channelId, `Top ${count} leetoos`, topN, count);
+  return buildBlocks(channelId, `Top ${count} leetoos`, topN);
 }
 
 export async function getPrematures(
@@ -36,24 +36,34 @@ export async function getPrematures(
   direction: "asc" | "desc" = "asc",
   count: number = 10,
 ): Promise<KnownBlock[]> {
-  const messages: DateMessageTuple[] = (await db.getAllLeets(channelId))
-    .map((it): DateMessageTuple => [slackTsToDate(it.ts), it.message])
-    .filter(([date]) => date.getHours() === 13 && date.getMinutes() === 36);
-
-  const topN: DateMessageTuple[] = R.pipe(
-    messages,
+  const messages: DateMessageTuple[] = R.pipe(
+    await db.getAllLeets(channelId),
+    R.map((it): DateMessageTuple => [slackTsToDate(it.ts), it.message]),
+    R.filter(
+      ([date]) =>
+        date.getHours() === 13 &&
+        date.getMinutes() === 36 &&
+        date.getSeconds() === 59,
+    ),
     R.sortBy([([date]) => date.getMilliseconds(), direction]),
     R.take(count),
   );
 
-  return buildBlocks(channelId, `Top 10 prematures`, topN, count);
+  return buildBlocks(
+    channelId,
+    `Top 10 prematures (${
+      direction === "desc" ? "nærmest 1337" : "lengst unna 1337"
+    })`,
+    messages,
+    true,
+  );
 }
 
 function buildBlocks(
   channelId: string,
   title: string,
   messages: DateMessageTuple[],
-  count: number,
+  premature: boolean = false,
 ): KnownBlock[] {
   return [
     {
@@ -69,23 +79,32 @@ function buildBlocks(
       text: {
         type: "mrkdwn",
         text:
-          messages.map(formatDateMessageTupleToLine(channelId)).join("\n") ||
-          "Ingen leets i denne kanalen. :sadparrot:",
+          messages
+            .map(formatDateMessageTupleToLine(channelId, premature))
+            .join("\n") || "Ingen leets i denne kanalen. :sadparrot:",
       },
     },
   ];
 }
 
-function formatDateMessageTupleToLine(channelId: string) {
+function formatDateMessageTupleToLine(channelId: string, premature: boolean) {
   return ([date, message]: DateMessageTuple, index: number): string => {
-    return `${index + 1}. ${date
-      .getMilliseconds()
-      .toFixed(0)
-      .padStart(3, "0")}ms av <@${message.user}>: "${
+    const lastPart = `av <@${message.user}>: "${
       message.text
     }" ${formatDistanceToNowStrict(date, {
       locale: nb,
       addSuffix: true,
     })} (<${createPermalink(channelId, message.ts)}|link>)`;
+
+    if (premature) {
+      return `${index + 1}. -${1000 - date.getMilliseconds()}ms ${lastPart}`;
+    }
+
+    return `${index + 1}. ${date
+      .getMilliseconds()
+      .toFixed(0)
+      .padStart(3, "0")}ms av <@${message.user}>: "${
+      message.text
+    }" ${lastPart}`;
   };
 }
