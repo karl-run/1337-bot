@@ -28,7 +28,7 @@ export async function getTopBlocks(
     R.take(count),
   );
 
-  return buildBlocks(channelId, topN, count);
+  return buildBlocks(channelId, `Top ${count} leetoos`, topN, count);
 }
 
 export async function getPrematures(
@@ -46,11 +46,12 @@ export async function getPrematures(
     R.take(count),
   );
 
-  return buildBlocks(channelId, topN, count);
+  return buildBlocks(channelId, `Top 10 prematures`, topN, count);
 }
 
 function buildBlocks(
   channelId: string,
+  title: string,
   messages: DateMessageTuple[],
   count: number,
 ): KnownBlock[] {
@@ -59,7 +60,7 @@ function buildBlocks(
       type: "header",
       text: {
         type: "plain_text",
-        text: `Top ${count} leetoos`,
+        text: title,
         emoji: true,
       },
     },

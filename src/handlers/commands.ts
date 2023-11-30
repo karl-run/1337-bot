@@ -61,7 +61,7 @@ export const commands = {
   ) {
     const prematureBlocks = await getPrematures(
       command.channel_id,
-      worst ? "asc" : "desc",
+      worst ? "desc" : "asc",
     );
 
     await client.chat.postMessage({
