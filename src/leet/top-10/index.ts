@@ -103,8 +103,6 @@ function formatDateMessageTupleToLine(channelId: string, premature: boolean) {
     return `${index + 1}. ${date
       .getMilliseconds()
       .toFixed(0)
-      .padStart(3, "0")}ms av <@${message.user}>: "${
-      message.text
-    }" ${lastPart}`;
+      .padStart(3, "0")}ms ${lastPart}`;
   };
 }
