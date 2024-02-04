@@ -1,11 +1,8 @@
 import { getTimeParts, slackTsToDate } from "../../utils/date-utils";
-import { getTodaysLeets } from "../../db/queries";
 
 export type LeetStatus = "leetos" | "leet" | "premature" | "late" | "garbage";
 
-export function classifyRow(
-  row: Awaited<ReturnType<typeof getTodaysLeets>>[number],
-): LeetStatus {
+export function classifyRow<Row extends { ts: string }>(row: Row): LeetStatus {
   const timeParts = getTimeParts(slackTsToDate(row.ts));
 
   if (timeParts.hour !== 13) {
