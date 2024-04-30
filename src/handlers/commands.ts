@@ -1,5 +1,5 @@
 import { WebClient } from "@slack/web-api";
-import { SlashCommand } from "@slack/bolt";
+import { KnownEventFromType, SlashCommand } from "@slack/bolt";
 
 import {
   getMonthName,
@@ -14,10 +14,22 @@ import { getPrematures, getTopBlocks } from "../leet/top-10";
 
 import { postOrUpdateDailyLeets } from "../slack/daily";
 import { getWeeklyScoreboardBlocks } from "../leet/score-engine/blocks-week";
+import { startOfDay } from "date-fns";
+import { handleReceivedLeetMessage } from "./leet-handlers";
 
 export type Commands = typeof commands;
 export const commands = {
   async handleDebougge(client: WebClient, command: SlashCommand) {
+    if (command.user_id !== "UA2QHC603") {
+      await client.chat.postEphemeral({
+        channel: command.channel_id,
+        user: command.user_id,
+        text: `:warning: Må du kødde med botten <@${command.user_id}>???`,
+      });
+
+      return;
+    }
+
     const { hour, minutes } = getTimeParts(new Date());
 
     if ((hour === 13 && minutes >= 37) || hour > 13) {
@@ -30,6 +42,43 @@ export const commands = {
       channel: command.channel_id,
       user: command.user_id,
       text: `:warning: Må du kødde med botten <@${command.user_id}>???`,
+    });
+  },
+
+  async handleRepars(client: WebClient, command: SlashCommand) {
+    if (command.user_id !== "UA2QHC603") {
+      await client.chat.postEphemeral({
+        channel: command.channel_id,
+        user: command.user_id,
+        text: `:warning: Må du kødde med botten <@${command.user_id}>???`,
+      });
+
+      return;
+    }
+
+    const messages = await client.conversations.history({
+      channel: command.channel_id,
+      oldest: `${startOfDay(new Date()).getTime() / 1000}`,
+    });
+
+    for (const message of messages.messages) {
+      await handleReceivedLeetMessage(
+        message as KnownEventFromType<"message">,
+        command.channel_id,
+        client,
+        ({ thread_ts, text }) =>
+          client.chat.postMessage({
+            channel: command.channel_id,
+            thread_ts,
+            text,
+          }),
+      );
+    }
+
+    await client.chat.postEphemeral({
+      channel: command.channel_id,
+      user: command.user_id,
+      text: `Reparsed today's messages (${messages.messages.length})`,
     });
   },
 

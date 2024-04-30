@@ -1,9 +1,7 @@
-// @ts-expect-error Tricksy typescript :)))
 import { Mock, describe, expect, test, mock, afterEach } from "bun:test";
 
 import type { Commands } from "./commands";
 import { createParser } from "./command-handlers";
-import { SlashCommand } from "@slack/bolt";
 import { WebClient } from "@slack/web-api";
 
 describe("args parsing", () => {
@@ -13,16 +11,17 @@ describe("args parsing", () => {
     handleStreaks: mock(),
     handleTop: mock(),
     handlePremature: mock(),
+    handleRepars: mock(),
   };
 
   const testParse = createTestParser(mocks);
 
   afterEach(() => {
-    (mocks.handleScoreboard as Mock).mockReset();
-    (mocks.handleDebougge as Mock).mockReset();
-    (mocks.handleStreaks as Mock).mockReset();
-    (mocks.handleTop as Mock).mockReset();
-    (mocks.handlePremature as Mock).mockReset();
+    (mocks.handleScoreboard as Mock<() => unknown>).mockReset();
+    (mocks.handleDebougge as Mock<() => unknown>).mockReset();
+    (mocks.handleStreaks as Mock<() => unknown>).mockReset();
+    (mocks.handleTop as Mock<() => unknown>).mockReset();
+    (mocks.handlePremature as Mock<() => unknown>).mockReset();
   });
 
   test("--help should give help", async () => {
@@ -196,8 +195,9 @@ describe("args parsing", () => {
   });
 });
 
-function lastParam<T>(mock: Mock): T {
-  const lastCall = mock.mock.lastCall;
+function lastParam<T>(mock: (...args: any[]) => any): T {
+  const forcedMock = mock as Mock<(...args: any[]) => any>;
+  const lastCall = forcedMock.mock.lastCall;
   return lastCall[lastCall.length - 1];
 }
 
@@ -205,10 +205,10 @@ function createTestParser(mocks: Commands) {
   return (command: string) =>
     new Promise((resolve, reject) => {
       createParser(
-        mock<SlashCommand>().mockImplementation(() => ({
+        mock().mockImplementation(() => ({
           text: command,
         }))(),
-        mock<WebClient>,
+        mock() as unknown as WebClient,
         mocks,
       ).parse(command, (err, _, output) => {
         if (err) reject(err);

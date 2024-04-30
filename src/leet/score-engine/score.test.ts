@@ -1,4 +1,3 @@
-// @ts-expect-error Tricksy typescript :)))
 import { expect, describe, test } from "bun:test";
 
 import { scoreLeets } from "./score";
