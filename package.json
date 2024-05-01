@@ -6,26 +6,24 @@
   "repository": "https://github.com/karl-run/1337-bot.git",
   "packageManager": "yarn@3.5.1",
   "scripts": {
-    "start": "ncc run src/server.ts",
-    "build": "ncc build src/server.ts -o dist"
+    "start": "bun run src/server.ts",
+    "build": "bun build --target=bun src/server.ts --outfile dist/server.js"
   },
   "dependencies": {
     "@slack/bolt": "^3.13.1",
     "croner": "^7.0.1",
     "date-fns": "^2.30.0",
     "date-fns-tz": "^2.0.0",
-    "dotenv": "^16.0.3",
     "open": "^9.1.0",
     "pg": "^8.11.3",
     "remeda": "^1.27.0",
     "yargs": "^17.7.2"
   },
   "devDependencies": {
+    "@types/bun": "^1.1.1",
     "@types/node": "^20.2.3",
     "@types/pg": "^8.10.2",
     "@types/yargs": "^17.0.25",
-    "@types/bun": "^1.1.1",
-    "@vercel/ncc": "^0.38.0",
     "prettier": "^3.0.3",
     "prettier-plugin-sql": "^0.15.1",
     "typescript": "^5.2.2"
