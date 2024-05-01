@@ -1,5 +1,3 @@
-import { App } from "@slack/bolt";
-import { config } from "dotenv";
 import { Cron } from "croner";
 import { initDb } from "./db/client";
 import { configureJokeHandlers } from "./handlers/joke-handlers";
@@ -7,14 +5,7 @@ import { configureLeetHandlers } from "./handlers/leet-handlers";
 import { configureCommandHandlers } from "./handlers/command-handlers";
 import { postOrUpdateDailyLeets } from "./slack/daily";
 import { postWeeklyScoreboard } from "./slack/weekly";
-
-config();
-
-const app = new App({
-  token: process.env.BOT_TOKEN,
-  appToken: process.env.APP_TOKEN,
-  socketMode: true,
-});
+import { app } from "./slack/slack";
 
 (async () => {
   await initDb();

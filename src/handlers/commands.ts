@@ -62,17 +62,26 @@ export const commands = {
     });
 
     for (const message of messages.messages) {
-      await handleReceivedLeetMessage(
-        message as KnownEventFromType<"message">,
-        command.channel_id,
-        client,
-        ({ thread_ts, text }) =>
-          client.chat.postMessage({
-            channel: command.channel_id,
-            thread_ts,
-            text,
-          }),
-      );
+      if (message.bot_profile != null) {
+        continue;
+      }
+
+      try {
+        await handleReceivedLeetMessage(
+          message as KnownEventFromType<"message">,
+          command.channel_id,
+          client,
+          ({ thread_ts, text }) =>
+            client.chat.postMessage({
+              channel: command.channel_id,
+              thread_ts,
+              text,
+            }),
+        );
+      } catch (e) {
+        console.error(e);
+        continue;
+      }
     }
 
     await client.chat.postEphemeral({
