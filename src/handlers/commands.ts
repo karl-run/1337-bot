@@ -62,7 +62,7 @@ export const commands = {
     });
 
     for (const message of messages.messages) {
-      if (message.bot_profile != null) {
+      if (message.bot_profile != null || !message.text.includes("1337")) {
         continue;
       }
 
