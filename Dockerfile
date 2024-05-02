@@ -1,10 +1,11 @@
-FROM oven/bun:1
+FROM gcr.io/distroless/nodejs18-debian11
 
 WORKDIR /app
-COPY dist/server.js /app/server.js
+
+COPY dist /app
 
 EXPOSE 3000
 
 ENV NODE_ENV=production
 
-CMD ["server.js"]
+CMD ["index.js"]
