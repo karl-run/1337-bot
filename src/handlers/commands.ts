@@ -14,7 +14,7 @@ import { getPrematures, getTopBlocks } from "../leet/top-10";
 
 import { postOrUpdateDailyLeets } from "../slack/daily";
 import { getWeeklyScoreboardBlocks } from "../leet/score-engine/blocks-week";
-import { startOfDay } from "date-fns";
+import { startOfDay, subDays } from "date-fns";
 import { handleReceivedLeetMessage } from "./leet-handlers";
 
 export type Commands = typeof commands;
@@ -45,7 +45,7 @@ export const commands = {
     });
   },
 
-  async handleRepars(client: WebClient, command: SlashCommand) {
+  async handleRepars(client: WebClient, command: SlashCommand, days: number) {
     if (command.user_id !== "UA2QHC603") {
       await client.chat.postEphemeral({
         channel: command.channel_id,
@@ -58,7 +58,10 @@ export const commands = {
 
     const messages = await client.conversations.history({
       channel: command.channel_id,
-      oldest: `${startOfDay(new Date()).getTime() / 1000}`,
+      oldest:
+        days === 1
+          ? `${startOfDay(new Date()).getTime() / 1000}`
+          : `${startOfDay(subDays(new Date(), days - 1)).getTime() / 1000}`,
     });
 
     for (const message of messages.messages) {

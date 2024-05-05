@@ -18,8 +18,16 @@ export function createParser(
     .command("debougge", "debougges the bot (don't use >:()", () =>
       commands.handleDebougge(client, command),
     )
-    .command("repars", "reparses today", () =>
-      commands.handleRepars(client, command),
+    .command(
+      "repars",
+      "reparses today",
+      (yargs) =>
+        yargs.positional("days", {
+          type: "number",
+          description: "how many days to reparse",
+          default: 1,
+        }),
+      (args) => commands.handleRepars(client, command, args.days),
     )
     .command("streaks", "gets all streaks of 3 or more days", () =>
       commands.handleStreaks(command, client),
