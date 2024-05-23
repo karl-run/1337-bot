@@ -28,7 +28,7 @@ export async function initDb() {
       CREATE TABLE IF NOT EXISTS leet_messages
       (
           id          SERIAL PRIMARY KEY,
-          ts          VARCHAR(255)                        NOT NULL,
+          ts          VARCHAR(255) UNIQUE                 NOT NULL,
           channel     VARCHAR(255)                        NOT NULL,
           ts_as_date  TIMESTAMP                           NOT NULL,
           inserted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
