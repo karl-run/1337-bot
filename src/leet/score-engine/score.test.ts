@@ -37,7 +37,7 @@ describe("score engine", () => {
   });
 });
 
-describe.skip("score engine - multiple leets", () => {
+describe("score engine - multiple leets", () => {
   test("only the leetoo should count", async () => {
     const [userA] = await scoreLeets([
       createLeet("user", "1337", createLeetooDate(123)),
@@ -84,6 +84,24 @@ describe.skip("score engine - multiple leets", () => {
 
     expect(userA.scoreSum).toBe(500 + 250);
   });
+
+  test("garbage before should be discounted", async () => {
+    const [userA] = await scoreLeets([
+      createLeet("user", "1337", createGarbage(32)),
+      createLeet("user", "1337", createLeetDate(1.5)),
+    ]);
+
+    expect(userA.scoreSum).toBe(750);
+  });
+
+  test("garbage after should be discounted", async () => {
+    const [userA] = await scoreLeets([
+      createLeet("user", "1337", createLeetDate(1.5)),
+      createLeet("user", "1337", createGarbage(39)),
+    ]);
+
+    expect(userA.scoreSum).toBe(750);
+  });
 });
 
 function createLeet(user: string, text: string, ts: Date): UserLeetRow {
@@ -95,6 +113,10 @@ function createLeet(user: string, text: string, ts: Date): UserLeetRow {
       text,
     } as UserLeetRow["message"],
   } as UserLeetRow;
+}
+
+function createGarbage(minutes: number): Date {
+  return new Date(2023, 5, 6, 13 - 2, minutes, 15, 169);
 }
 
 function createPrematureDate(ms: number): Date {
