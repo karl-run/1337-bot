@@ -22,11 +22,7 @@ export async function getTopBlocks(
         date.getSeconds() === 0,
     );
 
-  const topN: DateMessageTuple[] = R.pipe(
-    messages,
-    R.sortBy([([date, message]) => message.ts, "asc"]),
-    R.take(count),
-  );
+  const topN: DateMessageTuple[] = sortByMsThenNs(messages, count);
 
   return buildBlocks(channelId, `Top ${count} leetoos`, topN);
 }
@@ -105,6 +101,17 @@ function formatDateMessageTupleToLine(channelId: string, premature: boolean) {
       .toFixed(0)
       .padStart(3, "0")}ms ${addNanos(date, message)} ${lastPart}`;
   };
+}
+
+export function sortByMsThenNs(messages: DateMessageTuple[], count: number) {
+  return R.pipe(
+      messages,
+      R.sortBy(
+          [([date]) => date.getMilliseconds(), "asc"],
+          [([, message]) => message.ts.slice(-3), "asc"],
+      ),
+      R.take(count),
+  );
 }
 
 export function addNanos(date: Date, message: GenericMessageEvent): string {
