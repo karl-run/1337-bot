@@ -24,7 +24,7 @@ export async function getTopBlocks(
 
   const topN: DateMessageTuple[] = R.pipe(
     messages,
-    R.sortBy([([date]) => date.getMilliseconds(), "asc"]),
+    R.sortBy([([date, message]) => message.ts, "asc"]),
     R.take(count),
   );
 
@@ -103,6 +103,14 @@ function formatDateMessageTupleToLine(channelId: string, premature: boolean) {
     return `${index + 1}. ${date
       .getMilliseconds()
       .toFixed(0)
-      .padStart(3, "0")}ms ${lastPart}`;
+      .padStart(3, "0")}ms ${addNanos(date, message)} ${lastPart}`;
   };
+}
+
+export function addNanos(date: Date, message: GenericMessageEvent): string {
+  if (date.getMilliseconds() !== 0) {
+    return "";
+  }
+
+  return `(${message.ts.slice(-3)}ns)`;
 }
