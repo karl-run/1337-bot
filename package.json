@@ -3,6 +3,9 @@
   "license": "MIT",
   "private": true,
   "type": "module",
+  "workspaces": [
+    "apps/*"
+  ],
   "repository": "https://github.com/karl-run/1337-bot.git",
   "packageManager": "yarn@3.5.1",
   "scripts": {
@@ -21,13 +24,15 @@
     "yargs": "^17.7.2"
   },
   "devDependencies": {
+    "@karl-run/prettier-config": "^1.0.1",
+    "@types/bun": "^1.1.1",
     "@types/node": "^20.2.3",
     "@types/pg": "^8.10.2",
     "@types/yargs": "^17.0.25",
-    "@types/bun": "^1.1.1",
     "@vercel/ncc": "^0.38.0",
     "prettier": "^3.0.3",
     "prettier-plugin-sql": "^0.15.1",
     "typescript": "^5.2.2"
-  }
+  },
+  "prettier": "@karl-run/prettier-config"
 }
