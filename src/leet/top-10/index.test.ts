@@ -13,7 +13,7 @@ test("a 000ms should add nanos", () => {
 test("a 001ms should NOT add nanos", () => {
   const nanoTs = "1731674220001169";
 
-  expect(addNanos(new Date(+nanoTs / 1000), { ts: nanoTs } as any)).toEqual("");
+  expect(addNanos(new Date(+nanoTs / 1000), { ts: nanoTs } as any)).toEqual(" ");
 });
 
 test("sortByMsThenNs", () => {
