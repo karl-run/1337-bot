@@ -1,15 +1,15 @@
 import * as R from "remeda";
 import { LeetStatus, classifyRow } from "../daily-leet/row-utils";
-import { UserLeetRow } from "../../db/types";
 import { slackTsToMs, slackTsToSeconds } from "../../utils/date-utils";
 
 import { ScoredDay, ScoredMessage } from "./index";
+import { UserLeetDay } from "./score";
 
-export function scoreDay(leetsForDay: UserLeetRow[]): ScoredDay {
+export function scoreDay(leetsForDay: UserLeetDay[]): ScoredDay {
   return R.pipe(
     leetsForDay,
-    R.sortBy((row) => row.ts),
-    R.groupBy(classifyRow),
+    R.sortBy((row) => row.validLeet.ts),
+    R.groupBy((it) => classifyRow(it.validLeet)),
     (it) =>
       R.merge(
         {
@@ -18,7 +18,7 @@ export function scoreDay(leetsForDay: UserLeetRow[]): ScoredDay {
           leet: [],
           late: [],
           garbage: [],
-        } satisfies Record<LeetStatus, UserLeetRow[]>,
+        } satisfies Record<LeetStatus, UserLeetDay[]>,
         it,
       ),
     scoreLeetos,
@@ -29,70 +29,72 @@ export function scoreDay(leetsForDay: UserLeetRow[]): ScoredDay {
 }
 
 function scoreLeetos(
-  day: Record<LeetStatus, UserLeetRow[]>,
-): Record<LeetStatus, (UserLeetRow | ScoredMessage)[]> {
+  day: Record<LeetStatus, UserLeetDay[]>,
+): Record<LeetStatus, (UserLeetDay | ScoredMessage)[]> {
   return {
     ...day,
     leetos: day.leetos.map((leet): ScoredMessage => {
-      const ms = slackTsToMs(leet.ts);
+      const ms = slackTsToMs(leet.validLeet.ts);
 
       const omegaLeet = ms === 0;
       if (omegaLeet) {
         return {
           points: 13337,
-          message: leet,
+          message: leet.validLeet,
         };
       }
 
-      const firstBonus = leet.ts === day.leetos[0].ts ? 500 : 0;
+      const firstBonus =
+        leet.validLeet.ts === day.leetos[0].validLeet.ts ? 500 : 0;
       const points = firstBonus + 1000 + (1000 - ms);
 
       return {
         points,
-        message: leet,
+        message: leet.validLeet,
       };
     }),
   };
 }
 
 function scorePrematures(
-  day: Record<LeetStatus, UserLeetRow[]>,
-): Record<LeetStatus, (UserLeetRow | ScoredMessage)[]> {
+  day: Record<LeetStatus, UserLeetDay[]>,
+): Record<LeetStatus, (UserLeetDay | ScoredMessage)[]> {
   return {
     ...day,
     premature: day.premature.map((it): ScoredMessage => {
       return {
         points: -5000,
-        message: it,
+        message: it.validLeet,
       };
     }),
   };
 }
 
 function scoreLeets(
-  day: Record<LeetStatus, UserLeetRow[]>,
-): Record<LeetStatus, (UserLeetRow | ScoredMessage)[]> {
+  day: Record<LeetStatus, UserLeetDay[]>,
+): Record<LeetStatus, (UserLeetDay | ScoredMessage)[]> {
   return {
     ...day,
     leet: day.leet.map((it): ScoredMessage => {
       const firstBonus = day.leetos.length === 0 ? 500 : 0;
-      const within3SecondsPoints = slackTsToSeconds(it.ts) <= 3 ? 250 : 27;
+      const within3SecondsPoints =
+        slackTsToSeconds(it.validLeet.ts) <= 3 ? 250 : 27;
 
       return {
         points: firstBonus + within3SecondsPoints,
-        message: it,
+        message: it.validLeet,
       };
     }),
   };
 }
 
 function zeroTheRest(
-  day: Record<LeetStatus, UserLeetRow[]>,
+  day: Record<LeetStatus, UserLeetDay[]>,
 ): Record<LeetStatus, ScoredMessage[]> {
-  const zeroMessage = (it: UserLeetRow): ScoredMessage => {
+  const zeroMessage = (it: UserLeetDay): ScoredMessage => {
     return {
       points: 0,
-      message: it,
+      message: it.validLeet,
     };
   };
 
