@@ -40,7 +40,7 @@ export async function handleReceivedLeetMessage(
       thread_ts: message.ts,
       text: `Premature leetjaculation <@${
         (message as any).user
-      }>!!! Du var ${negativeOffset} millisekunder for tidlig! :hot_face:`,
+      }>!!! Du var ${negativeOffset} ${ms === 1 ? "millisekund" : "millisekunder"} for tidlig! :hot_face:`,
     });
     return;
   }
@@ -52,14 +52,14 @@ export async function handleReceivedLeetMessage(
       thread_ts: message.ts,
       text: `En ekte leetoo, <@${
         (message as any).user
-      }>! :leetoo: Du var ${ms} millisekunder inn i sekundet.`,
+      }>! :leetoo: Du var ${ms} ${ms === 1 ? "millisekund" : "millisekunder"} inn i sekundet.`,
     });
   } else if (isLeet) {
     await reply({
       thread_ts: message.ts,
       text: `Bra jobba <@${
         (message as any).user
-      }>! Du var ${seconds} sekunder inn i minuttet.`,
+      }>! Du var ${seconds} ${seconds === 1 ? "sekund" : "sekunder"} inn i minuttet.`,
     });
   } else {
     await reply({
